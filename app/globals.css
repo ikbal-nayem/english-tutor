@@ -1,0 +1,528 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 48%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom scrollbar */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.light .scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+/* Light theme overrides */
+.light {
+  background-color: #ffffff;
+  color: #1a202c;
+}
+
+.light .bg-gradient-to-b {
+  background: #ffffff;
+}
+
+/* Dark theme overrides for eye comfort */
+.dark {
+  background-color: #121212;
+  color: #e2e8f0;
+}
+
+.dark .bg-gradient-to-b {
+  background: linear-gradient(to bottom, #1a202c, #2d3748);
+}
+
+/* Speech bubble styles */
+.speech-bubble-agent {
+  position: relative;
+}
+
+.speech-bubble-agent::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 15px;
+  border-width: 10px 10px 10px 0;
+  border-style: solid;
+  border-color: transparent rgba(79, 70, 229, 0.4) transparent transparent;
+}
+
+.light .speech-bubble-agent::before {
+  border-color: transparent rgba(79, 70, 229, 0.1) transparent transparent;
+}
+
+.speech-bubble-user {
+  position: relative;
+}
+
+.speech-bubble-user::before {
+  content: "";
+  position: absolute;
+  right: -10px;
+  top: 15px;
+  border-width: 10px 0 10px 10px;
+  border-style: solid;
+  border-color: transparent transparent transparent rgba(124, 58, 237, 0.4);
+}
+
+.light .speech-bubble-user::before {
+  border-color: transparent transparent transparent rgba(124, 58, 237, 0.1);
+}
+
+/* Fancy animations */
+@keyframes pulse-border {
+  0% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(124, 58, 237, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+  }
+}
+
+.pulse-border {
+  animation: pulse-border 2s infinite;
+}
+
+/* New fancy animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+@keyframes slideInFromLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slideInFromLeft {
+  animation: slideInFromLeft 0.3s ease-out forwards;
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slideInFromRight {
+  animation: slideInFromRight 0.3s ease-out forwards;
+}
+
+@keyframes glowPulse {
+  0% {
+    box-shadow: 0 0 5px rgba(99, 102, 241, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.8);
+  }
+  100% {
+    box-shadow: 0 0 5px rgba(99, 102, 241, 0.5);
+  }
+}
+
+.animate-glowPulse {
+  animation: glowPulse 2s infinite;
+}
+
+/* Typing indicator animation */
+.typing-indicator {
+  display: flex;
+  align-items: center;
+}
+
+.typing-indicator span {
+  height: 8px;
+  width: 8px;
+  margin: 0 1px;
+  background-color: #6366f1;
+  border-radius: 50%;
+  display: inline-block;
+  opacity: 0.4;
+}
+
+.typing-indicator span:nth-child(1) {
+  animation: bounce 1.5s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation: bounce 1.5s infinite 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation: bounce 1.5s infinite 0.4s;
+}
+
+@keyframes bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.4;
+  }
+  30% {
+    transform: translateY(-4px);
+    opacity: 1;
+  }
+}
+
+/* Message hover effects */
+.message-bubble {
+  transition: all 0.3s ease;
+}
+
+.message-bubble:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Gradient text */
+.gradient-text {
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  background-image: linear-gradient(to right, #6366f1, #8b5cf6, #d946ef);
+}
+
+/* Glass morphism effect */
+.glass-morphism {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.light .glass-morphism {
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Light mode specific overrides for chat */
+.light .bg-slate-800\/80 {
+  background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.light .bg-slate-900\/80 {
+  background-color: rgba(249, 250, 251, 0.9) !important;
+}
+
+.light .bg-slate-800\/50 {
+  background-color: rgba(255, 255, 255, 0.95) !important;
+}
+
+.light .bg-slate-700\/50 {
+  background-color: rgba(243, 244, 246, 1) !important;
+}
+
+.light .border-slate-700 {
+  border-color: rgba(229, 231, 235, 1) !important;
+}
+
+.light .border-slate-600 {
+  border-color: rgba(209, 213, 219, 1) !important;
+}
+
+.light .text-white {
+  color: rgba(17, 24, 39, 1) !important;
+}
+
+.light .text-gray-300 {
+  color: rgba(107, 114, 128, 1) !important;
+}
+
+.light .text-gray-400 {
+  color: rgba(75, 85, 99, 1) !important;
+}
+
+.light .placeholder\:text-white\/50::placeholder {
+  color: rgba(107, 114, 128, 0.7) !important;
+}
+
+/* Fix for speech bubbles in light mode */
+.light .speech-bubble-agent::before {
+  border-color: transparent rgba(79, 70, 229, 0.1) transparent transparent !important;
+}
+
+.light .speech-bubble-user::before {
+  border-color: transparent transparent transparent rgba(59, 130, 246, 0.1) !important;
+}
+
+/* Ensure text is visible in light mode */
+.light .from-indigo-500\/30.to-purple-600\/30 {
+  background: linear-gradient(to bottom right, rgba(99, 102, 241, 0.1), rgba(147, 51, 234, 0.1)) !important;
+}
+
+.light .from-blue-500\/30.to-teal-500\/30 {
+  background: linear-gradient(to bottom right, rgba(59, 130, 246, 0.1), rgba(20, 184, 166, 0.1)) !important;
+}
+
+/* Ensure textarea text is visible in light mode */
+.light textarea.bg-slate-700\/50 {
+  background-color: white !important;
+  color: #1f2937 !important;
+}
+
+.light textarea.bg-slate-700\/50::placeholder {
+  color: #9ca3af !important;
+}
+
+/* Force light mode styles with !important */
+html.light .bg-gradient-to-br.from-slate-800\/80.to-slate-900\/80 {
+  background: white !important;
+}
+
+html.light .text-white,
+html.light .dark\:text-gray-100 {
+  color: #1f2937 !important;
+}
+
+html.light .bg-gradient-to-r.from-indigo-600\/30.to-purple-600\/30 {
+  background: linear-gradient(to right, rgba(79, 70, 229, 0.1), rgba(124, 58, 237, 0.1)) !important;
+}
+
+html.light .bg-gradient-to-br.from-indigo-500\/30.to-purple-600\/30 {
+  background: linear-gradient(to bottom right, rgba(79, 70, 229, 0.1), rgba(124, 58, 237, 0.1)) !important;
+}
+
+html.light .bg-gradient-to-br.from-blue-500\/30.to-teal-500\/30 {
+  background: linear-gradient(to bottom right, rgba(59, 130, 246, 0.1), rgba(20, 184, 166, 0.1)) !important;
+}
+
+/* Force light mode text colors */
+html.light .text-white,
+html.light .dark\:text-white,
+html.light .dark\:text-gray-100 {
+  color: #1f2937 !important;
+}
+
+html.light .text-white\/70,
+html.light .dark\:text-gray-300,
+html.light .dark\:text-gray-400 {
+  color: #4b5563 !important;
+}
+
+html.light .text-gray-300,
+html.light .dark\:text-gray-300 {
+  color: #6b7280 !important;
+}
+
+html.light .text-gray-400,
+html.light .dark\:text-gray-400 {
+  color: #9ca3af !important;
+}
+
+/* Force light mode backgrounds */
+html.light .bg-white\/10 {
+  background-color: rgba(243, 244, 246, 0.8) !important;
+}
+
+html.light .bg-white\/5 {
+  background-color: rgba(249, 250, 251, 0.8) !important;
+}
+
+html.light .bg-slate-700\/50 {
+  background-color: white !important;
+}
+
+html.light .bg-slate-800\/50 {
+  background-color: rgba(249, 250, 251, 0.9) !important;
+}
+
+/* Force light mode borders */
+html.light .border-white\/10 {
+  border-color: rgba(229, 231, 235, 0.5) !important;
+}
+
+html.light .border-slate-700 {
+  border-color: rgba(229, 231, 235, 1) !important;
+}
+
+html.light .border-slate-600 {
+  border-color: rgba(209, 213, 219, 1) !important;
+}
+
+/* Force light mode placeholders */
+html.light .placeholder\:text-white\/50::placeholder {
+  color: rgba(107, 114, 128, 0.7) !important;
+}
+
+/* Add these styles to the end of your existing globals.css file */
+
+/* Redesigned input area */
+.light .bg-slate-700\/30 {
+  background-color: rgba(243, 244, 246, 0.7) !important;
+}
+
+.light textarea.bg-transparent {
+  color: #1f2937 !important;
+}
+
+.light textarea.bg-transparent::placeholder {
+  color: rgba(107, 114, 128, 0.7) !important;
+}
+
+/* Feedback modal styles */
+.light .bg-slate-800 {
+  background-color: white !important;
+}
+
+.light .bg-green-900\/20 {
+  background-color: rgba(220, 252, 231, 0.7) !important;
+}
+
+.light .bg-red-900\/20 {
+  background-color: rgba(254, 226, 226, 0.7) !important;
+}
+
+.light .bg-indigo-900\/20 {
+  background-color: rgba(224, 231, 255, 0.7) !important;
+}
+
+.light .bg-amber-900\/20 {
+  background-color: rgba(254, 243, 199, 0.7) !important;
+}
+
+/* Feedback buttons */
+.light .bg-red-900\/30 {
+  background-color: rgba(254, 226, 226, 0.8) !important;
+}
+
+.light .bg-amber-900\/30 {
+  background-color: rgba(254, 243, 199, 0.8) !important;
+}
+
+.light .text-red-300 {
+  color: rgb(185, 28, 28) !important;
+}
+
+.light .text-amber-300 {
+  color: rgb(217, 119, 6) !important;
+}
+
+/* Hover states for feedback buttons */
+.light .hover\:bg-red-900\/50:hover {
+  background-color: rgba(254, 202, 202, 0.8) !important;
+}
+
+.light .hover\:bg-amber-900\/50:hover {
+  background-color: rgba(253, 230, 138, 0.8) !important;
+}
+
+/* Modal tab styles */
+.light .border-indigo-400 {
+  border-color: rgb(79, 70, 229) !important;
+}
+
+.light .text-indigo-400 {
+  color: rgb(79, 70, 229) !important;
+}
+
+/* Improved animation for feedback buttons */
+@keyframes pulse-subtle {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s infinite;
+}
