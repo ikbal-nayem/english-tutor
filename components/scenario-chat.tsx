@@ -529,7 +529,6 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
           </div>
         </CardContent>
 
-        {/* Redesigned Chat Input */}
         {!isComplete && (
           <div className="p-4 border-t border-slate-700 dark:border-gray-700 light:border-gray-200 bg-slate-800/50 dark:bg-gray-800/50 light:bg-white/90 backdrop-blur-sm">
             {speechRecognitionError && (
@@ -561,18 +560,18 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
             <div className="relative flex items-end gap-2 bg-slate-700/30 dark:bg-gray-700/30 light:bg-gray-100 rounded-xl p-1 border border-slate-600/50 dark:border-gray-600/50 light:border-gray-300">
               {/* Mic button moved to the left */}
               {browserSupportsSpeechRecognition && (
-                <button
+                <Button
                   type="button"
                   onClick={isRecording ? handleStopRecording : handleStartRecording}
                   disabled={isProcessing}
-                  className={`p-2 rounded-full flex-shrink-0 transition-all duration-200 ${
+                  className={`p-3 rounded-full flex-shrink-0 transition-all duration-200 ${
                     isRecording
                       ? "bg-red-500/80 text-white hover:bg-red-600/80"
                       : "bg-blue-500/80 text-white hover:bg-blue-600/80"
                   }`}
                 >
                   {isRecording ? <MicOff className="h-5 w-5" /> : <Mic className="h-5 w-5" />}
-                </button>
+                </Button>
               )}
 
               <form onSubmit={handleTextSubmit} className="flex-grow flex items-end">
@@ -599,9 +598,9 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
                 <Button
                   type="submit"
                   disabled={isProcessing || !textInput.trim()}
-                  className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-full p-2 flex-shrink-0 shadow-md hover:shadow-lg transition-all duration-200"
+                  className="bg-gradient-to-r from-purple-500 to-indigo-600 hover:from-purple-600 hover:to-indigo-700 text-white rounded-full p-3 shadow-md hover:shadow-lg transition-all duration-200"
                 >
-                  <Send className="h-5 w-5" />
+                  <Send className="h-6 w-6" />
                 </Button>
               </form>
             </div>
