@@ -1,10 +1,8 @@
-<!-- Write a readme file for this project use logo from public folder -->
-
 # English Tutor
 
-<img src="/ikbal-nayem/english-tutor/raw/master/public/logo.png" alt="English Tutor Logo" style="max-width: 100%; height: auto; text-align: center;">
+<img src="/public/logo.png" alt="English Tutor Logo" style="max-width: 100%; height: auto; text-align: center;">
 
-![English Tutor Logo](public/logo.png)
+<!-- ![English Tutor Logo](public/logo.png) -->
 
 Welcome to English Tutor, an AI-powered platform designed to help you improve your English speaking skills through realistic conversations and instant feedback.
 
