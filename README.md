@@ -1,8 +1,6 @@
 # English Tutor
 
-<img src="/public/logo.png" alt="English Tutor Logo" style="max-width: 100%; height: auto; text-align: center;">
-
-<!-- ![English Tutor Logo](public/logo.png) -->
+<img src="/public/logo.png" alt="English Tutor Logo" style="max-width: 100%;">
 
 Welcome to English Tutor, an AI-powered platform designed to help you improve your English speaking skills through realistic conversations and instant feedback.
 
