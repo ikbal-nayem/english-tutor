@@ -1,6 +1,6 @@
 // This is the service worker for the PWA
 
-const CACHE_NAME = "english-skills-app-v1"
+const CACHE_NAME = "english-tutor"
 const urlsToCache = ["/", "/manifest.json", "/icons/icon-192x192.png", "/icons/icon-512x512.png"]
 
 self.addEventListener("install", (event) => {
