@@ -1,53 +1,42 @@
-"use client"
+"use client";
 
-import type React from "react"
-import type { Message } from "@/types/scenarios"
+import type { Message, ScenarioData } from "@/types/scenarios";
+import type React from "react";
 
-import { useState, useEffect, useRef } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Mic, MicOff, Send, ArrowLeft, Volume2, Info, AlertTriangle, User, Lightbulb, Check } from "lucide-react"
-import { useSpeechRecognition } from "@/hooks/use-speech-recognition"
-import { useLanguageProcessing } from "@/hooks/use-language-processing"
-import { useRouter } from "next/navigation"
-import { Alert, AlertDescription } from "@/components/ui/alert"
-import { ConfirmationDialog } from "@/components/ui/confirmation-dialog"
-import ScenarioEvaluation from "@/components/scenario-evaluation"
-import { scenarioData } from "@/lib/scenario-data"
-import { analyzeVocabulary } from "@/lib/vocabulary-analyzer"
-import { generateChatResponse } from "@/lib/chat-actions"
-import { FeedbackModal } from "@/components/feedback-modal"
+import { FeedbackModal } from "@/components/feedback-modal";
+import ScenarioEvaluation from "@/components/scenario-evaluation";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
+import { useLanguageProcessing } from "@/hooks/use-language-processing";
+import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
+import { generateChatResponse } from "@/lib/chat-actions";
+import { analyzeVocabulary } from "@/lib/vocabulary-analyzer";
+import { AlertTriangle, Check, Info, Lightbulb, Mic, MicOff, Send, User, Volume2 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import Markdown from "react-markdown";
 
-export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
-  const [messages, setMessages] = useState<Message[]>([])
-  const [textInput, setTextInput] = useState("")
-  const [isProcessing, setIsProcessing] = useState(false)
-  const [isRecording, setIsRecording] = useState(false)
-  const [showConfirmDialog, setShowConfirmDialog] = useState(false)
-  const [isComplete, setIsComplete] = useState(false)
-  const [showEvaluation, setShowEvaluation] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [wantsToQuit, setWantsToQuit] = useState(false)
+export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [textInput, setTextInput] = useState("");
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const [showEvaluation, setShowEvaluation] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [wantsToQuit, setWantsToQuit] = useState(false);
 
   // New state for feedback modals
-  const [showFeedbackModal, setShowFeedbackModal] = useState(false)
-  const [feedbackModalType, setFeedbackModalType] = useState<"mistakes" | "suggestions">("mistakes")
-  const [selectedFeedback, setSelectedFeedback] = useState<Message["feedback"] | null>(null)
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
+  const [feedbackModalType, setFeedbackModalType] = useState<"mistakes" | "suggestions">("mistakes");
+  const [selectedFeedback, setSelectedFeedback] = useState<Message["feedback"] | null>(null);
 
-  const messagesEndRef = useRef<HTMLDivElement>(null)
-  const textareaRef = useRef<HTMLTextAreaElement>(null)
-  const router = useRouter()
-
-  // Get the scenario data
-  const scenario = scenarioData[scenarioId]
-
-  // If scenario doesn't exist, show error and redirect
-  useEffect(() => {
-    if (!scenario && scenarioId) {
-      console.error(`Scenario with ID "${scenarioId}" not found`)
-      router.push("/scenarios")
-    }
-  }, [scenario, scenarioId, router])
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const router = useRouter();
 
   const {
     transcript,
@@ -57,14 +46,14 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
     stopListening,
     browserSupportsSpeechRecognition,
     error: speechRecognitionError,
-  } = useSpeechRecognition()
+  } = useSpeechRecognition();
 
-  const { processText } = useLanguageProcessing()
+  const { processText } = useLanguageProcessing();
 
   // Initialize with first question
   useEffect(() => {
     if (!scenario) {
-      return
+      return;
     }
 
     // Only set the initial message if the messages array is empty
@@ -74,38 +63,38 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
           role: "agent",
           content: scenario.initialQuestion,
         },
-      ])
+      ]);
     }
 
     // Set up navigation interception
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (messages.length > 1 && !isComplete && !showEvaluation) {
-        e.preventDefault()
-        e.returnValue = ""
-        return ""
+        e.preventDefault();
+        e.returnValue = "";
+        return "";
       }
-    }
+    };
 
-    window.addEventListener("beforeunload", handleBeforeUnload)
+    window.addEventListener("beforeunload", handleBeforeUnload);
 
     return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload)
-    }
-  }, [scenario, showEvaluation, isComplete, messages.length]) // Only depend on messages.length, not the entire messages array
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [scenario, showEvaluation, isComplete, messages.length]); // Only depend on messages.length, not the entire messages array
 
   // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"
-      const scrollHeight = textareaRef.current.scrollHeight
-      textareaRef.current.style.height = `${Math.min(scrollHeight, 200)}px` // Max 10 lines (approx 200px)
+      textareaRef.current.style.height = "auto";
+      const scrollHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = `${Math.min(scrollHeight, 200)}px`; // Max 10 lines (approx 200px)
     }
-  }, [textInput])
+  }, [textInput]);
 
   // Scroll to bottom when messages change
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   // Handle transcript from speech recognition - append to existing text instead of replacing
   useEffect(() => {
@@ -113,95 +102,95 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
       // Append the new transcript to the existing text input
       setTextInput((prev) => {
         // If the previous input is empty, just use the transcript
-        if (!prev.trim()) return transcript
+        if (!prev.trim()) return transcript;
 
         // Otherwise, check if we need to add a space between the previous text and new transcript
-        const needsSpace = !prev.endsWith(" ") && !transcript.startsWith(" ")
-        return prev + (needsSpace ? " " : "") + transcript
-      })
+        const needsSpace = !prev.endsWith(" ") && !transcript.startsWith(" ");
+        return prev + (needsSpace ? " " : "") + transcript;
+      });
 
       // Reset the transcript to prepare for the next chunk
-      resetTranscript()
+      resetTranscript();
     }
-  }, [transcript, isRecording, resetTranscript])
+  }, [transcript, isRecording, resetTranscript]);
 
   // Handle navigation
   const handleNavigation = () => {
     if (messages.length > 1 && !isComplete && !showEvaluation) {
-      setWantsToQuit(true)
-      setShowConfirmDialog(true)
+      setWantsToQuit(true);
+      setShowConfirmDialog(true);
     } else {
-      router.push("/scenarios")
+      router.push("/scenarios");
     }
-  }
+  };
 
   const confirmNavigation = () => {
-    setShowConfirmDialog(false)
+    setShowConfirmDialog(false);
 
     if (wantsToQuit && messages.length > 1) {
       // Show evaluation before leaving
-      setIsComplete(true)
-      setShowEvaluation(true)
+      setIsComplete(true);
+      setShowEvaluation(true);
     } else {
-      router.push("/scenarios")
+      router.push("/scenarios");
     }
-  }
+  };
 
   const handleStartRecording = () => {
-    resetTranscript()
-    setIsRecording(true)
-    startListening()
-  }
+    resetTranscript();
+    setIsRecording(true);
+    startListening();
+  };
 
   const handleStopRecording = () => {
-    setIsRecording(false)
-    stopListening()
-  }
+    setIsRecording(false);
+    stopListening();
+  };
 
   // Open feedback modal
   const openFeedbackModal = (feedback: Message["feedback"], type: "mistakes" | "suggestions") => {
-    setSelectedFeedback(feedback)
-    setFeedbackModalType(type)
-    setShowFeedbackModal(true)
-  }
+    setSelectedFeedback(feedback);
+    setFeedbackModalType(type);
+    setShowFeedbackModal(true);
+  };
 
   const handleSubmit = async (text: string) => {
-    if (!text.trim() || isProcessing || !scenario) return
+    if (!text.trim() || isProcessing || !scenario) return;
 
     // Stop recording if active
     if (isRecording) {
-      stopListening()
-      setIsRecording(false)
+      stopListening();
+      setIsRecording(false);
     }
 
-    setIsProcessing(true)
-    setError(null)
+    setIsProcessing(true);
+    setError(null);
 
     // Analyze vocabulary
-    const vocabularyAnalysis = analyzeVocabulary(text)
+    const vocabularyAnalysis = analyzeVocabulary(text);
 
     // Add user message immediately
     const userMessage: Message = {
       role: "user",
       content: text,
       vocabularyAnalysis,
-    }
+    };
 
     // Update messages state with user message
-    setMessages((prevMessages) => [...prevMessages, userMessage])
+    setMessages((prevMessages) => [...prevMessages, userMessage]);
 
     // Clear input field immediately
-    setTextInput("")
+    setTextInput("");
 
     try {
       // Process the text with AI for language feedback
-      const result = await processText(text)
+      const result = await processText(text);
 
       // Update the user message with feedback
       setMessages((prevMessages) => {
-        const updated = [...prevMessages]
+        const updated = [...prevMessages];
         // Find the last user message
-        const lastUserMessageIndex = updated.findIndex((msg, idx) => msg.role === "user" && idx === updated.length - 1)
+        const lastUserMessageIndex = updated.findIndex((msg, idx) => msg.role === "user" && idx === updated.length - 1);
 
         if (lastUserMessageIndex !== -1) {
           updated[lastUserMessageIndex] = {
@@ -211,15 +200,21 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
               mistakes: result.mistakes,
               suggestions: result.suggestions,
             },
-          }
+          };
         }
 
-        return updated
-      })
+        return updated;
+      });
 
       // Use OpenRouter API to generate a response with full conversation history
-      const response = await generateChatResponse(text, scenario.title, scenario.userRole, scenario.agentName, messages)
-      console.log("API response:", response)
+      const response = await generateChatResponse(
+        text,
+        scenario.title,
+        scenario.userRole,
+        scenario.agentName,
+        messages
+      );
+      console.log("API response:", response);
 
       // Add the agent's response
       const agentMessage: Message = {
@@ -227,12 +222,12 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
         content: response.success
           ? response.response
           : "I'm sorry, I didn't quite understand. Could you rephrase that?",
-      }
+      };
 
-      setMessages((prevMessages) => [...prevMessages, agentMessage])
+      setMessages((prevMessages) => [...prevMessages, agentMessage]);
 
       // Check if we should end the conversation (after 10 exchanges)
-      const userMessageCount = messages.filter((m) => m.role === "user").length
+      const userMessageCount = messages.filter((m) => m.role === "user").length;
 
       if (userMessageCount >= 9) {
         // Changed from 8 to 9 to make it end after 10 exchanges (including the one just added)
@@ -244,56 +239,56 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
               role: "agent",
               content: "I think we've covered quite a bit in our conversation. Let's review how you did!",
             },
-          ])
-          setIsComplete(true)
-          setTimeout(() => setShowEvaluation(true), 1500)
-        }, 1500)
+          ]);
+          setIsComplete(true);
+          setTimeout(() => setShowEvaluation(true), 1500);
+        }, 1500);
       }
     } catch (error) {
-      console.error("Error processing text:", error)
-      setError("Failed to process your message. Please try again.")
+      console.error("Error processing text:", error);
+      setError("Failed to process your message. Please try again.");
 
       // Add a fallback response if the chat generation fails
       const fallbackMessage: Message = {
         role: "agent",
         content:
           "I'm having trouble responding right now. Let's continue our conversation. What would you like to talk about?",
-      }
+      };
 
-      setMessages((prevMessages) => [...prevMessages, fallbackMessage])
+      setMessages((prevMessages) => [...prevMessages, fallbackMessage]);
     } finally {
-      setIsProcessing(false)
+      setIsProcessing(false);
     }
-  }
+  };
 
   const handleTextSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
+    e.preventDefault();
     if (textInput.trim()) {
-      handleSubmit(textInput)
+      handleSubmit(textInput);
     }
-  }
+  };
 
   const handleTryAgain = () => {
-    if (!scenario) return
+    if (!scenario) return;
 
     setMessages([
       {
         role: "agent",
         content: scenario.initialQuestion,
       },
-    ])
-    setIsComplete(false)
-    setShowEvaluation(false)
-    setWantsToQuit(false)
-  }
+    ]);
+    setIsComplete(false);
+    setShowEvaluation(false);
+    setWantsToQuit(false);
+  };
 
   // Function to handle text-to-speech with custom voice
   const speakText = (text: string) => {
     if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(text)
+      const utterance = new SpeechSynthesisUtterance(text);
 
       // Get available voices
-      const voices = window.speechSynthesis.getVoices()
+      const voices = window.speechSynthesis.getVoices();
 
       // Try to find a female voice
       const femaleVoice = voices.find(
@@ -301,57 +296,27 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
           voice.name.includes("female") ||
           voice.name.includes("Samantha") ||
           voice.name.includes("Victoria") ||
-          voice.name.includes("Tessa"),
-      )
+          voice.name.includes("Tessa")
+      );
 
       if (femaleVoice) {
-        utterance.voice = femaleVoice
+        utterance.voice = femaleVoice;
       }
 
       // Set other properties
-      utterance.rate = 1.0
-      utterance.pitch = 1.1
+      utterance.rate = 1.0;
+      utterance.pitch = 1.1;
 
-      window.speechSynthesis.speak(utterance)
+      window.speechSynthesis.speak(utterance);
     }
-  }
-
-  if (!scenario) {
-    return (
-      <div className="flex flex-col items-center justify-center h-[50vh]">
-        <div className="text-center">
-          <h2 className="text-xl font-bold mb-2 text-white dark:text-white light:text-gray-900">Scenario Not Found</h2>
-          <p className="text-gray-400 dark:text-gray-400 light:text-gray-600 mb-4">
-            The scenario you're looking for doesn't exist or couldn't be loaded.
-          </p>
-          <Button onClick={() => router.push("/scenarios")} className="bg-blue-600 hover:bg-blue-700 text-white">
-            Return to Scenarios
-          </Button>
-        </div>
-      </div>
-    )
-  }
+  };
 
   if (showEvaluation) {
-    return <ScenarioEvaluation messages={messages} scenarioTitle={scenario.title} onTryAgain={handleTryAgain} />
+    return <ScenarioEvaluation messages={messages} scenarioTitle={scenario.title} onTryAgain={handleTryAgain} />;
   }
 
   return (
-    <div className="flex flex-col h-[85vh]">
-      <div className="flex items-center mb-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="text-white hover:text-white dark:text-gray-300 dark:hover:text-white light:text-gray-700 light:hover:text-gray-900"
-          onClick={handleNavigation}
-        >
-          <ArrowLeft className="h-4 w-4 mr-1" />
-          Back to Scenarios
-        </Button>
-        <h1 className="text-xl font-bold ml-2 text-white dark:text-white light:text-gray-900">{scenario.title}</h1>
-      </div>
-
-      {/* Fancy Redesigned Chat UI */}
+    <>
       <Card className="flex-grow flex flex-col overflow-hidden bg-gradient-to-br from-slate-800/80 to-slate-900/80 dark:from-gray-800 dark:to-gray-900 light:from-white light:to-gray-50 border-slate-700 dark:border-gray-700 light:border-gray-200 shadow-xl rounded-xl">
         {/* Chat Header */}
         <CardHeader className="bg-gradient-to-r from-indigo-600/30 to-purple-600/30 dark:from-gray-700/50 dark:to-gray-800/50 light:from-indigo-50 light:to-purple-50 py-3 border-b border-slate-700 dark:border-gray-700 light:border-gray-200">
@@ -364,7 +329,7 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
                 <span className="text-white dark:text-white light:text-gray-900 font-medium">{scenario.agentName}</span>
                 <div className="text-xs text-white/70 dark:text-gray-400 light:text-gray-500 flex items-center">
                   <span className="inline-block w-2 h-2 rounded-full bg-green-500 mr-1.5 animate-pulse"></span>
-                  Online
+                  {isProcessing ? "Processing..." : "Online"}
                 </div>
               </div>
             </span>
@@ -417,7 +382,9 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
                           <Volume2 className="h-5 w-5 group-hover:animate-pulse" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-white dark:text-gray-100 light:text-gray-900">{message.content}</p>
+                          <p className="text-white dark:text-gray-100 light:text-gray-900">
+                            <Markdown>{`${message.content}`}</Markdown>
+                          </p>
                         </div>
                       </div>
                     ) : (
@@ -428,17 +395,17 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
                             {message.vocabularyAnalysis ? (
                               <>
                                 {message.content.split(" ").map((word, i) => {
-                                  const cleanWord = word.replace(/[.,!?;:'"()]/g, "").toLowerCase()
+                                  const cleanWord = word.replace(/[.,!?;:'"()]/g, "").toLowerCase();
 
                                   // Check if it's an advanced word
                                   const isAdvanced = message.vocabularyAnalysis?.advancedWords.some(
-                                    (w) => w.word === cleanWord,
-                                  )
+                                    (w) => w.word === cleanWord
+                                  );
 
                                   // Check if it's a common word
                                   const isCommon = message.vocabularyAnalysis?.commonWords.some(
-                                    (w) => w.word === cleanWord,
-                                  )
+                                    (w) => w.word === cleanWord
+                                  );
 
                                   if (isAdvanced) {
                                     return (
@@ -448,7 +415,7 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
                                       >
                                         {word}{" "}
                                       </span>
-                                    )
+                                    );
                                   } else if (isCommon) {
                                     return (
                                       <span
@@ -457,9 +424,9 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
                                       >
                                         {word}{" "}
                                       </span>
-                                    )
+                                    );
                                   } else {
-                                    return <span key={i}>{word} </span>
+                                    return <span key={i}>{word} </span>;
                                   }
                                 })}
                               </>
@@ -531,17 +498,16 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
                       <div
                         className="w-2 h-2 rounded-full bg-indigo-400 dark:bg-indigo-500 light:bg-indigo-600 animate-bounce"
                         style={{ animationDelay: "0ms" }}
-                      ></div>
+                      />
                       <div
                         className="w-2 h-2 rounded-full bg-indigo-400 dark:bg-indigo-500 light:bg-indigo-600 animate-bounce"
                         style={{ animationDelay: "150ms" }}
-                      ></div>
+                      />
                       <div
                         className="w-2 h-2 rounded-full bg-indigo-400 dark:bg-indigo-500 light:bg-indigo-600 animate-bounce"
                         style={{ animationDelay: "300ms" }}
-                      ></div>
+                      />
                     </div>
-                    <span className="ml-2 text-white dark:text-gray-200 light:text-gray-900">Thinking...</span>
                   </div>
                 </div>
               </div>
@@ -621,9 +587,9 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
                     rows={1}
                     onKeyDown={(e) => {
                       if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault()
+                        e.preventDefault();
                         if (textInput.trim()) {
-                          handleSubmit(textInput)
+                          handleSubmit(textInput);
                         }
                       }
                     }}
@@ -660,6 +626,6 @@ export default function ScenarioChat({ scenarioId }: { scenarioId: string }) {
         confirmText="Yes, Show Evaluation"
         cancelText="Continue Conversation"
       />
-    </div>
-  )
+    </>
+  );
 }

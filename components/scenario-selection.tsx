@@ -1,13 +1,13 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Utensils, Briefcase, Users, Plane, ShoppingBag, Stethoscope, School, Phone, Coffee } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { scenarioData } from "@/lib/scenario-data"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { scenarioData } from "@/lib/scenario-data";
+import { Briefcase, Coffee, Phone, Plane, School, ShoppingBag, Stethoscope, Users, Utensils } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
 
 // Define the scenario icons
 const scenarioIcons: Record<string, React.ReactNode> = {
@@ -20,30 +20,30 @@ const scenarioIcons: Record<string, React.ReactNode> = {
   academic: <School className="h-6 w-6 text-indigo-400" />,
   phonecall: <Phone className="h-6 w-6 text-cyan-400" />,
   coffeechat: <Coffee className="h-6 w-6 text-amber-400" />,
-}
+};
 
 export default function ScenarioSelection() {
-  const [selectedScenario, setSelectedScenario] = useState<string | null>(null)
-  const [filter, setFilter] = useState<string>("all")
-  const router = useRouter()
+  const [selectedScenario, setSelectedScenario] = useState<string | null>(null);
+  const [filter, setFilter] = useState<string>("all");
+  const router = useRouter();
 
   // Convert scenarioData object to array for easier filtering
   const scenariosArray = Object.entries(scenarioData).map(([id, data]) => ({
     id,
     ...data,
     difficulty: getDifficultyFromId(id), // Function to determine difficulty based on ID
-  }))
+  }));
 
   const handleStartScenario = () => {
     if (selectedScenario) {
-      router.push(`/scenarios/${selectedScenario}`)
+      router.push(`/scenarios/${selectedScenario}`);
     }
-  }
+  };
 
   const filteredScenarios =
     filter === "all"
       ? scenariosArray
-      : scenariosArray.filter((s) => s.difficulty.toLowerCase() === filter.toLowerCase())
+      : scenariosArray.filter((s) => s.difficulty.toLowerCase() === filter.toLowerCase());
 
   return (
     <div className="flex flex-col items-center">
@@ -110,7 +110,7 @@ export default function ScenarioSelection() {
             className={`cursor-pointer transition-all ${
               selectedScenario === scenario.id
                 ? "bg-white/20 dark:bg-gray-700/50 light:bg-blue-50 border-blue-400 shadow-lg scale-105"
-                : "bg-white/5 dark:bg-gray-800/30 light:bg-white hover:bg-white/10 dark:hover:bg-gray-700/30 light:hover:bg-gray-50 border-transparent"
+                : "bg-white/5 dark:bg-gray-800/30 light:bg-white hover:bg-white/10 dark:hover:bg-gray-700/30 light:hover:bg-gray-50 border-2 border-white/20 dark:border-gray-700"
             }`}
             onClick={() => setSelectedScenario(scenario.id)}
           >
@@ -127,8 +127,8 @@ export default function ScenarioSelection() {
                     scenario.difficulty === "Beginner"
                       ? "bg-green-500/20 text-green-300 dark:bg-green-900/30 dark:text-green-400 light:bg-green-100 light:text-green-700"
                       : scenario.difficulty === "Intermediate"
-                        ? "bg-yellow-500/20 text-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 light:bg-yellow-100 light:text-yellow-700"
-                        : "bg-red-500/20 text-red-300 dark:bg-red-900/30 dark:text-red-400 light:bg-red-100 light:text-red-700"
+                      ? "bg-yellow-500/20 text-yellow-300 dark:bg-yellow-900/30 dark:text-yellow-400 light:bg-yellow-100 light:text-yellow-700"
+                      : "bg-red-500/20 text-red-300 dark:bg-red-900/30 dark:text-red-400 light:bg-red-100 light:text-red-700"
                   }`}
                 >
                   {scenario.difficulty}
@@ -153,18 +153,18 @@ export default function ScenarioSelection() {
         Start Scenario
       </Button>
     </div>
-  )
+  );
 }
 
 // Helper function to extract emoji from title
 function getEmojiFromTitle(title: string): string {
-  const emojiMatch = title.match(/[\p{Emoji}]/u)
-  return emojiMatch ? emojiMatch[0] : "💬"
+  const emojiMatch = title.match(/[\p{Emoji}]/u);
+  return emojiMatch ? emojiMatch[0] : "💬";
 }
 
 // Helper function to get title without emoji
 function getTitleWithoutEmoji(title: string): string {
-  return title.replace(/[\p{Emoji}]/u, "").trim()
+  return title.replace(/[\p{Emoji}]/u, "").trim();
 }
 
 // Helper function to determine difficulty based on scenario ID
@@ -179,7 +179,7 @@ function getDifficultyFromId(id: string): string {
     healthcare: "Advanced",
     interview: "Advanced",
     academic: "Advanced",
-  }
+  };
 
-  return difficultyMap[id] || "Intermediate"
+  return difficultyMap[id] || "Intermediate";
 }
