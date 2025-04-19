@@ -167,6 +167,8 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
       vocabularyAnalysis,
     };
 
+    const llmLastQuestion: string = messages[messages.length - 1]?.content || "";
+
     // Update messages state with user message
     setMessages((prevMessages) => [...prevMessages, userMessage]);
 
@@ -175,7 +177,7 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
 
     try {
       // Process the text with AI for language feedback
-      const result = await processText(text);
+      const result = await processText(text, llmLastQuestion);
 
       // Update the user message with feedback
       setMessages((prevMessages) => {

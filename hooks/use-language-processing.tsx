@@ -2,22 +2,22 @@
 
 import { useState } from "react"
 import type { Sentence } from "@/types/speech"
-import { processLanguage } from "@/lib/text-analyzer"
+import { textAnalyzer } from "@/lib/text-analyzer"
 
 interface LanguageProcessingHook {
-  processText: (text: string) => Promise<Sentence>
+  processText: (text: string, llmLastQuestion?: string) => Promise<Sentence>
   isProcessing: boolean
 }
 
 export function useLanguageProcessing(): LanguageProcessingHook {
   const [isProcessing, setIsProcessing] = useState(false)
 
-  const processText = async (text: string): Promise<Sentence> => {
+  const processText = async (text: string, llmLastQuestion?: string): Promise<Sentence> => {
     console.log("Processing text:", text)
     setIsProcessing(true)
 
     try {
-      const result = await processLanguage(text)
+      const result = await textAnalyzer(text, llmLastQuestion)
       console.log("Processed result:", result)
       return result
     } catch (error) {

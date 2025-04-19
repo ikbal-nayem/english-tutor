@@ -3,11 +3,18 @@
 import type { Sentence } from "@/types/speech";
 import { getLLMResponse, setNextTokenIndex, tokenIndex, tokenLength } from "./openrouter";
 
-export async function processLanguage(text: string): Promise<Sentence> {
-  // Define the prompt for the language model
+export async function textAnalyzer(text: string, llmLastQuestion?: string): Promise<Sentence> {
+  const lastQuestion = llmLastQuestion
+    ? `
+You asked the question: "${llmLastQuestion}"
+`
+    : "";
+
   const prompt = `
 You are an English language tutor helping someone improve their speaking skills.
-Analyze the following text that was transcribed from speech:
+${lastQuestion}
+
+Analyze the following text/answer that was transcribed from speech:
 
 "${text}"
 
