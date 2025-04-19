@@ -1,3 +1,4 @@
+"use client";
 
 const allVoicesObtained = new Promise(function (resolve, reject) {
   let voices = window.speechSynthesis.getVoices();
@@ -10,7 +11,6 @@ const allVoicesObtained = new Promise(function (resolve, reject) {
     });
   }
 });
-
 
 export function speakText(text: string) {
   if ("speechSynthesis" in window) {

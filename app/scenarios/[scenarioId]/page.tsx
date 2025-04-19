@@ -4,9 +4,16 @@ import { scenarioData } from "@/lib/scenario-data";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { use } from "react";
 
-export default function ScenarioPage({ params }: { params: { scenarioId: string } }) {
-  const scenario = scenarioData[params.scenarioId];
+type ScenarioPageProps = {
+  params: Promise<{ scenarioId: string }>;
+};
+
+export default function ScenarioPage({ params }: ScenarioPageProps) {
+  const { scenarioId } = use(params);
+
+  const scenario = scenarioData[scenarioId];
 
   if (!scenario) {
     redirect("/scenarios");

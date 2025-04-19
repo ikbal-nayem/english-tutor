@@ -1,24 +1,25 @@
 "use server"
 
 import type { Sentence } from "@/types/speech"
+import { getAPIResponse, setNextTokenIndex, tokenIndex, tokenLength } from "./openrouter"
 
 // Function to process language using OpenRouter API
 export async function processLanguage(text: string): Promise<Sentence> {
-  const OR_TOKEN = process.env.OR_TOKEN
-  const LLM = process.env.LLM || "google/gemma-3-4b-it:free" // Default to a smaller model if LLM not set
+  // const OR_TOKEN = process.env.OR_TOKEN
+  // const LLM = process.env.LLM || "google/gemma-3-4b-it:free" // Default to a smaller model if LLM not set
 
-  if (!OR_TOKEN) {
-    throw new Error("OpenRouter API token is not configured")
-  }
+  // if (!OR_TOKEN) {
+  //   throw new Error("OpenRouter API token is not configured")
+  // }
 
   // Parse the comma-separated list of tokens
-  const tokens = OR_TOKEN.split(",").map((token) => token.trim())
+  // const tokens = OR_TOKEN.split(",").map((token) => token.trim())
 
-  if (tokens.length === 0) {
-    throw new Error("No valid OpenRouter API tokens found")
-  }
+  // if (tokens.length === 0) {
+  //   throw new Error("No valid OpenRouter API tokens found")
+  // }
 
-  console.log(`Processing text with model: ${LLM} (${tokens.length} tokens available)`)
+  // console.log(`Processing text with model: ${LLM} (${tokens.length} tokens available)`)
 
   // Define the prompt for the language model
   const prompt = `
@@ -57,33 +58,35 @@ Example response format:
 
   // Try each token until one works or we run out of tokens
   let lastError = null
-  let tokenIndex = 0
+  // let tokenIndex = 0
 
-  while (tokenIndex < tokens.length) {
-    const currentToken = tokens[tokenIndex]
+  while (tokenIndex < tokenLength) {
+    // const currentToken = tokens[tokenIndex]
+    console.log(tokenIndex)
 
     try {
-      console.log(`Trying token ${tokenIndex + 1}/${tokens.length}...`)
+      console.log(`Trying token ${tokenIndex + 1}/${tokenLength}...`)
       // Make the API request to OpenRouter
-      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${currentToken}`,
-          "HTTP-Referer": "https://vercel.com",
-          "X-Title": "English Speaking Skills Improvement App",
-        },
-        body: JSON.stringify({
-          model: LLM,
-          messages: [
-            {
-              role: "user",
-              content: prompt,
-            },
-          ],
-          response_format: { type: "json_object" },
-        }),
-      })
+      const response = await getAPIResponse(prompt, { type: "json_object" })
+      // const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "application/json",
+      //     Authorization: `Bearer ${currentToken}`,
+      //     "HTTP-Referer": "https://vercel.com",
+      //     "X-Title": "English Speaking Skills Improvement App",
+      //   },
+      //   body: JSON.stringify({
+      //     model: LLM,
+      //     messages: [
+      //       {
+      //         role: "user",
+      //         content: prompt,
+      //       },
+      //     ],
+      //     response_format: { type: "json_object" },
+      //   }),
+      // })
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: { message: "Unknown error" } }))
@@ -98,14 +101,15 @@ Example response format:
               errorData.error.message.includes("exceeded")))
         ) {
           console.log(`Token ${tokenIndex + 1} limit exceeded, trying next token...`)
-          tokenIndex++
+          // tokenIndex++
+          setNextTokenIndex()
           continue
         }
 
         // Check specifically for credit error
         if (response.status === 402) {
           // If this is the last token, return error
-          if (tokenIndex === tokens.length - 1) {
+          if (tokenIndex === tokenLength - 1) {
             return {
               originalText: text,
               correctedText: text,
@@ -118,7 +122,8 @@ Example response format:
             }
           } else {
             // Try next token
-            tokenIndex++
+            // tokenIndex++
+            setNextTokenIndex()
             continue
           }
         }
@@ -135,7 +140,7 @@ Example response format:
         console.error("Unexpected API response structure:", data)
 
         // If this is the last token, return error
-        if (tokenIndex === tokens.length - 1) {
+        if (tokenIndex === tokenLength - 1) {
           return {
             originalText: text,
             correctedText: text,
@@ -146,7 +151,8 @@ Example response format:
           }
         } else {
           // Try next token
-          tokenIndex++
+          // tokenIndex++
+          setNextTokenIndex()
           continue
         }
       }
@@ -201,7 +207,7 @@ Example response format:
           console.error("Regex extraction failed:", regexError)
 
           // If this is the last token, return error
-          if (tokenIndex === tokens.length - 1) {
+          if (tokenIndex === tokenLength - 1) {
             // Return a graceful error response if all parsing attempts fail
             return {
               originalText: text,
@@ -213,7 +219,8 @@ Example response format:
             }
           } else {
             // Try next token
-            tokenIndex++
+            // tokenIndex++
+            setNextTokenIndex()
             continue
           }
         }
@@ -233,7 +240,8 @@ Example response format:
       lastError = error
 
       // Try the next token
-      tokenIndex++
+      // tokenIndex++
+      setNextTokenIndex()
     }
   }
 
