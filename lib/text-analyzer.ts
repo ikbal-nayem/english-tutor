@@ -1,7 +1,7 @@
 "use server";
 
 import type { Sentence } from "@/types/speech";
-import { getAPIResponse, setNextTokenIndex, tokenIndex, tokenLength } from "./openrouter";
+import { getLLMResponse, setNextTokenIndex, tokenIndex, tokenLength } from "./openrouter";
 
 export async function processLanguage(text: string): Promise<Sentence> {
   // Define the prompt for the language model
@@ -42,8 +42,7 @@ Example response format:
   while (tokenIndex < tokenLength) {
     // const currentToken = tokens[tokenIndex]
     try {
-      console.log(`Trying token ${tokenIndex + 1}/${tokenLength}...`);
-      const response = await getAPIResponse([{ role: "user", content: prompt }], { type: "json_object" });
+      const response = await getLLMResponse([{ role: "user", content: prompt }], { type: "json_object" });
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({ error: { message: "Unknown error" } }));
@@ -62,7 +61,6 @@ Example response format:
             setNextTokenIndex();
             break;
           }
-          console.log(`Token ${tokenIndex + 1} limit exceeded, trying next token...`);
           setNextTokenIndex();
           continue;
         }
@@ -86,7 +84,6 @@ Example response format:
         };
       }
 
-      // Parse the response content
       try {
         // Get the content from the response
         const content = data.choices[0].message.content;

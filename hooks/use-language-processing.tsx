@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import type { Sentence } from "@/types/speech"
-import { processLanguage } from "@/lib/openrouter-api"
+import { processLanguage } from "@/lib/text-analyzer"
 
 interface LanguageProcessingHook {
   processText: (text: string) => Promise<Sentence>

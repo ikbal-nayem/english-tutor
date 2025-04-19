@@ -10,11 +10,12 @@ export const tokenLength = tokens.length;
 export let tokenIndex = 0;
 
 export const setNextTokenIndex = () => {
+  console.log(`Token ${tokenIndex + 1} limit exceeded, trying next token...`);
   tokenIndex = (tokenIndex + 1) % tokenLength;
 };
 
-export const getAPIResponse = async (messages: any, response_format?: Record<string, string>): Promise<Response> => {
-  console.log("tokenIndex", tokenIndex);
+export const getLLMResponse = async (messages: any, response_format?: Record<string, string>): Promise<Response> => {
+  console.log(`Trying token ${tokenIndex + 1}/${tokenLength}...`);
 
   if (tokens.length === 0) {
     throw new Error("No valid OpenRouter API tokens found");
