@@ -17,6 +17,7 @@ import { AlertTriangle, Check, Info, Lightbulb, Mic, MicOff, Send, User, Volume2
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
+import { speakText } from "@/lib/text-to-speech";
 
 export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -114,16 +115,6 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
     }
   }, [transcript, isRecording, resetTranscript]);
 
-  // Handle navigation
-  const handleNavigation = () => {
-    if (messages.length > 1 && !isComplete && !showEvaluation) {
-      setWantsToQuit(true);
-      setShowConfirmDialog(true);
-    } else {
-      router.push("/scenarios");
-    }
-  };
-
   const confirmNavigation = () => {
     setShowConfirmDialog(false);
 
@@ -155,7 +146,7 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
   };
 
   const handleSubmit = async (text: string) => {
-    if (!text.trim() || isProcessing || !scenario) return;
+    if (!text.trim() || isProcessing) return;
 
     // Stop recording if active
     if (isRecording) {
@@ -282,35 +273,6 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
     setWantsToQuit(false);
   };
 
-  // Function to handle text-to-speech with custom voice
-  const speakText = (text: string) => {
-    if ("speechSynthesis" in window) {
-      const utterance = new SpeechSynthesisUtterance(text);
-
-      // Get available voices
-      const voices = window.speechSynthesis.getVoices();
-
-      // Try to find a female voice
-      const femaleVoice = voices.find(
-        (voice) =>
-          voice.name.includes("female") ||
-          voice.name.includes("Samantha") ||
-          voice.name.includes("Victoria") ||
-          voice.name.includes("Tessa")
-      );
-
-      if (femaleVoice) {
-        utterance.voice = femaleVoice;
-      }
-
-      // Set other properties
-      utterance.rate = 1.0;
-      utterance.pitch = 1.1;
-
-      window.speechSynthesis.speak(utterance);
-    }
-  };
-
   if (showEvaluation) {
     return <ScenarioEvaluation messages={messages} scenarioTitle={scenario.title} onTryAgain={handleTryAgain} />;
   }
@@ -382,9 +344,9 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
                           <Volume2 className="h-5 w-5 group-hover:animate-pulse" />
                         </div>
                         <div className="flex-1">
-                          <p className="text-white dark:text-gray-100 light:text-gray-900">
+                          <div className="text-white dark:text-gray-100 light:text-gray-900">
                             <Markdown>{`${message.content}`}</Markdown>
-                          </p>
+                          </div>
                         </div>
                       </div>
                     ) : (
@@ -556,7 +518,6 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
               </div>
             )}
 
-            {/* Redesigned input area */}
             <div className="relative flex items-end gap-2 bg-slate-700/30 dark:bg-gray-700/30 light:bg-gray-100 rounded-xl p-1 border border-slate-600/50 dark:border-gray-600/50 light:border-gray-300">
               {/* Mic button moved to the left */}
               {browserSupportsSpeechRecognition && (

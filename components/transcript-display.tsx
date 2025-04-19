@@ -263,7 +263,7 @@ export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps)
                         key={i}
                         className="text-sm text-red-600 dark:text-red-400 light:text-red-600 flex items-start"
                       >
-                        <span className="inline-block w-4 h-4 bg-red-200 rounded-full text-red-600 flex items-center justify-center text-xs mr-2 mt-0.5 dark:bg-red-800 dark:text-red-300 light:bg-red-200 light:text-red-600">
+                        <span className="w-4 h-4 bg-red-200 rounded-full text-red-600 flex items-center justify-center text-xs mr-2 mt-0.5 dark:bg-red-800 dark:text-red-300 light:bg-red-200 light:text-red-600">
                           {i + 1}
                         </span>
                         {mistake}

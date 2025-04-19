@@ -5,7 +5,7 @@ import type { Sentence } from "@/types/speech"
 // Function to process language using OpenRouter API
 export async function processLanguage(text: string): Promise<Sentence> {
   const OR_TOKEN = process.env.OR_TOKEN
-  const LLM = process.env.LLM || "anthropic/claude-3-haiku:beta" // Default to a smaller model if LLM not set
+  const LLM = process.env.LLM || "google/gemma-3-4b-it:free" // Default to a smaller model if LLM not set
 
   if (!OR_TOKEN) {
     throw new Error("OpenRouter API token is not configured")

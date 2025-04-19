@@ -10,7 +10,7 @@ export async function generateChatResponse(
   conversationHistory: Message[] = [],
 ): Promise<{ success: boolean; response: string }> {
   const OR_TOKEN = process.env.OR_TOKEN
-  const LLM = process.env.LLM || "anthropic/claude-3-haiku:beta" // Use the same LLM as in other parts
+  const LLM = process.env.LLM || "google/gemma-3-4b-it:free" // Use the same LLM as in other parts
 
   if (!OR_TOKEN) {
     console.error("OpenRouter API token is not configured")
