@@ -182,13 +182,11 @@ export default function SpeechImprovementApp() {
 
   return (
     <div className="flex flex-col gap-4">
-      {/* New compact recorder design */}
       <div className="flex flex-col md:flex-row gap-4">
         <Card className="md:w-1/3 p-3 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white dark:from-indigo-600 dark:via-purple-600 dark:to-pink-600 light:from-indigo-400 light:via-purple-400 light:to-pink-400 shadow-md">
           <div className="flex flex-col h-full">
             <div className="flex justify-between items-center mb-2">
               <h2 className="text-sm font-bold">Speech Recorder</h2>
-              {/* Only show recording indicator when actually recording (not paused) */}
               {isListening && !isPaused && (
                 <div className="flex items-center text-xs bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5">
                   <span className="animate-pulse mr-1 text-red-300">●</span> Recording
@@ -205,7 +203,7 @@ export default function SpeechImprovementApp() {
                   </div>
                 ) : (
                   <div className="space-y-1">
-                    <div className="flex items-center text-green-200 text-xs">
+                    <div className="flex items-center text-green-200 text-xs gap-2">
                       <div className="relative mr-1">
                         <Mic className="h-3 w-3" />
                         <div className="absolute -inset-1 rounded-full bg-green-400/30 animate-pulse" />
