@@ -22,6 +22,8 @@ Welcome to English Tutor, an AI-powered platform designed to help you improve yo
 
 2. Open your browser and navigate to `http://localhost:3000` to access the application.
 
-3. Create `.env` file and add your OpenRouter API key and LLM model name (Example in `.env.example`).
+3. Create `.env` file and add your OpenRouter API key (Example in `.env.example`).
 
-4. Start practicing your English speaking skills!
+4. Optionally, add your LLM model name to `LLM` in `.env` file.
+
+5. Start practicing your English speaking skills!
