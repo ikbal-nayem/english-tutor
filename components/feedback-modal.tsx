@@ -1,19 +1,19 @@
-"use client"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Card, CardContent } from "@/components/ui/card"
-import { AlertTriangle, Lightbulb, Check } from "lucide-react"
-import type { Message } from "@/types/scenarios"
+"use client";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { Message } from "@/types/scenarios";
+import { AlertTriangle, Check, Lightbulb } from "lucide-react";
 
 interface FeedbackModalProps {
-  isOpen: boolean
-  onClose: () => void
-  feedback: Message["feedback"] | null
-  type: "mistakes" | "suggestions"
+  isOpen: boolean;
+  onClose: () => void;
+  feedback: Message["feedback"] | null;
+  type: "mistakes" | "suggestions";
 }
 
 export function FeedbackModal({ isOpen, onClose, feedback, type }: FeedbackModalProps) {
-  if (!feedback) return null
+  if (!feedback) return null;
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -107,5 +107,5 @@ export function FeedbackModal({ isOpen, onClose, feedback, type }: FeedbackModal
         </Tabs>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
