@@ -46,7 +46,7 @@ export function FeedbackModal({ isOpen, onClose, feedback, type }: FeedbackModal
           </TabsList>
 
           <TabsContent value="mistakes" className="mt-4 space-y-4">
-            {feedback.correctedText && feedback.correctedText !== feedback.originalText && (
+            {feedback.correctedText && (
               <Card className="bg-slate-700/30 dark:bg-gray-700/30 light:bg-gray-50 border-slate-600 dark:border-gray-600 light:border-gray-200">
                 <CardContent className="p-4">
                   <h3 className="text-sm font-medium text-green-400 dark:text-green-400 light:text-green-700 mb-2 flex items-center">
