@@ -67,7 +67,7 @@ export default function RootLayout({
         <ThemeProvider defaultTheme="dark">
           <PWARegister />
           <NextTopLoader color="#4f46e5" height={2} shadow="0 0 10px #4f46e5,0 0 5px #4f46e5" showSpinner={false} />
-          <div className="min-h-screen bg-gradient-to-b from-slate-900 via-purple-900 to-slate-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 light:from-white light:via-gray-50 light:to-white text-white dark:text-gray-100 light:text-gray-900 flex flex-col">
+          <div className="min-h-screen bg-gradient-to-b from-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 light:from-white light:via-gray-50 light:to-white text-gray-900 dark:text-gray-100 flex flex-col">
             <nav className="bg-black/20 dark:bg-black/10 light:bg-white backdrop-blur-sm border-b border-white/10 dark:border-gray-800 light:border-gray-200 sticky top-0 z-10">
               <div className="container mx-auto px-4 py-2 max-w-4xl flex items-center justify-between">
                 <div className="flex items-center">
