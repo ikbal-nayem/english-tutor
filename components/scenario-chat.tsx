@@ -12,12 +12,11 @@ import { ConfirmationDialog } from "@/components/ui/confirmation-dialog";
 import { useLanguageProcessing } from "@/hooks/use-language-processing";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import { generateChatResponse } from "@/lib/chat-actions";
-import { analyzeVocabulary } from "@/lib/vocabulary-analyzer";
+import { speakText } from "@/lib/text-to-speech";
 import { AlertTriangle, Check, Info, Lightbulb, Mic, MicOff, Send, User, Volume2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import Markdown from "react-markdown";
-import { speakText } from "@/lib/text-to-speech";
 
 export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
   const [messages, setMessages] = useState<Message[]>([]);
@@ -57,7 +56,6 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
       return;
     }
 
-    // Only set the initial message if the messages array is empty
     if (messages.length === 0) {
       setMessages([
         {
@@ -81,14 +79,14 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
     return () => {
       window.removeEventListener("beforeunload", handleBeforeUnload);
     };
-  }, [scenario, showEvaluation, isComplete, messages.length]); // Only depend on messages.length, not the entire messages array
+  }, [scenario, showEvaluation, isComplete, messages.length]);
 
   // Auto-resize textarea
   useEffect(() => {
     if (textareaRef.current) {
       textareaRef.current.style.height = "auto";
       const scrollHeight = textareaRef.current.scrollHeight;
-      textareaRef.current.style.height = `${Math.min(scrollHeight, 200)}px`; // Max 10 lines (approx 200px)
+      textareaRef.current.style.height = `${Math.min(scrollHeight, 200)}px`;
     }
   }, [textInput]);
 
@@ -109,8 +107,6 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
         const needsSpace = !prev.endsWith(" ") && !transcript.startsWith(" ");
         return prev + (needsSpace ? " " : "") + transcript;
       });
-
-      // Reset the transcript to prepare for the next chunk
       resetTranscript();
     }
   }, [transcript, isRecording, resetTranscript]);
@@ -138,7 +134,6 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
     stopListening();
   };
 
-  // Open feedback modal
   const openFeedbackModal = (feedback: Message["feedback"], type: "mistakes" | "suggestions") => {
     setSelectedFeedback(feedback);
     setFeedbackModalType(type);
@@ -148,7 +143,6 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
   const handleSubmit = async (text: string) => {
     if (!text.trim() || isProcessing) return;
 
-    // Stop recording if active
     if (isRecording) {
       stopListening();
       setIsRecording(false);
@@ -157,29 +151,20 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
     setIsProcessing(true);
     setError(null);
 
-    // Analyze vocabulary
-    const vocabularyAnalysis = analyzeVocabulary(text);
-
-    // Add user message immediately
     const userMessage: Message = {
       role: "user",
       content: text,
-      vocabularyAnalysis,
     };
 
     const llmLastQuestion: string = messages[messages.length - 1]?.content || "";
 
-    // Update messages state with user message
     setMessages((prevMessages) => [...prevMessages, userMessage]);
-
-    // Clear input field immediately
     setTextInput("");
 
     try {
       // Process the text with AI for language feedback
       const result = await processText(text, llmLastQuestion);
 
-      // Update the user message with feedback
       setMessages((prevMessages) => {
         const updated = [...prevMessages];
         // Find the last user message
@@ -199,7 +184,6 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
         return updated;
       });
 
-      // Use OpenRouter API to generate a response with full conversation history
       const response = await generateChatResponse(
         text,
         scenario.title,
@@ -209,7 +193,6 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
       );
       console.log("API response:", response);
 
-      // Add the agent's response
       const agentMessage: Message = {
         role: "agent",
         content: response.success
@@ -219,11 +202,9 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
 
       setMessages((prevMessages) => [...prevMessages, agentMessage]);
 
-      // Check if we should end the conversation (after 10 exchanges)
       const userMessageCount = messages.filter((m) => m.role === "user").length;
 
       if (userMessageCount >= 9) {
-        // Changed from 8 to 9 to make it end after 10 exchanges (including the one just added)
         // End the conversation after 10 exchanges
         setTimeout(() => {
           setMessages((prevMessages) => [
@@ -282,7 +263,6 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
   return (
     <>
       <Card className="flex-grow flex flex-col overflow-hidden bg-gradient-to-br from-slate-800/80 to-slate-900/80 dark:from-gray-800 dark:to-gray-900 light:from-white light:to-gray-50 border-slate-700 dark:border-gray-700 light:border-gray-200 shadow-xl rounded-xl">
-        {/* Chat Header */}
         <CardHeader className="bg-gradient-to-r from-indigo-600/30 to-purple-600/30 dark:from-gray-700/50 dark:to-gray-800/50 light:from-indigo-50 light:to-purple-50 py-3 border-b border-slate-700 dark:border-gray-700 light:border-gray-200">
           <CardTitle className="text-lg flex items-center justify-between">
             <span className="flex items-center">
@@ -354,50 +334,7 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
                     ) : (
                       <div>
                         <div className="flex justify-between items-start">
-                          <p className="pr-2 text-white dark:text-gray-100 light:text-gray-900">
-                            {/* Highlight vocabulary in the message */}
-                            {message.vocabularyAnalysis ? (
-                              <>
-                                {message.content.split(" ").map((word, i) => {
-                                  const cleanWord = word.replace(/[.,!?;:'"()]/g, "").toLowerCase();
-
-                                  // Check if it's an advanced word
-                                  const isAdvanced = message.vocabularyAnalysis?.advancedWords.some(
-                                    (w) => w.word === cleanWord
-                                  );
-
-                                  // Check if it's a common word
-                                  const isCommon = message.vocabularyAnalysis?.commonWords.some(
-                                    (w) => w.word === cleanWord
-                                  );
-
-                                  if (isAdvanced) {
-                                    return (
-                                      <span
-                                        key={i}
-                                        className="text-green-300 dark:text-green-400 light:text-green-700 font-medium"
-                                      >
-                                        {word}{" "}
-                                      </span>
-                                    );
-                                  } else if (isCommon) {
-                                    return (
-                                      <span
-                                        key={i}
-                                        className="text-yellow-300 dark:text-yellow-400 light:text-yellow-700"
-                                      >
-                                        {word}{" "}
-                                      </span>
-                                    );
-                                  } else {
-                                    return <span key={i}>{word} </span>;
-                                  }
-                                })}
-                              </>
-                            ) : (
-                              message.content
-                            )}
-                          </p>
+                          <p className="pr-2 text-white dark:text-gray-100 light:text-gray-900">{message.content}</p>
                           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center ml-2 flex-shrink-0 text-white shadow-md">
                             <User className="h-4 w-4" />
                           </div>

@@ -21,15 +21,15 @@ export interface Message {
     mistakes?: string[]
     suggestions?: string[]
   }
-  vocabularyAnalysis?: {
-    commonWords: {
-      word: string
-      index: number
-      alternatives: string[]
-    }[]
-    advancedWords: {
-      word: string
-      index: number
-    }[]
-  }
+  // vocabularyAnalysis?: {
+  //   commonWords: {
+  //     word: string
+  //     index: number
+  //     alternatives: string[]
+  //   }[]
+  //   advancedWords: {
+  //     word: string
+  //     index: number
+  //   }[]
+  // }
 }
