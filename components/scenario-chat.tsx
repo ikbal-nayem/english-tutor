@@ -162,12 +162,10 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
     setTextInput("");
 
     try {
-      // Process the text with AI for language feedback
       const result = await processText(text, llmLastQuestion);
 
       setMessages((prevMessages) => {
         const updated = [...prevMessages];
-        // Find the last user message
         const lastUserMessageIndex = updated.findIndex((msg, idx) => msg.role === "user" && idx === updated.length - 1);
 
         if (lastUserMessageIndex !== -1) {
