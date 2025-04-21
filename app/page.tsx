@@ -1,10 +1,10 @@
-import type React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Mic, MessageSquare } from "lucide-react";
-import Link from "next/link";
-import { PWARegister } from "./pwa";
+import { MessageSquare, Mic } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import type React from "react";
+import { PWARegister } from "./pwa";
 
 export default function Home() {
   return (
@@ -13,8 +13,8 @@ export default function Home() {
 
       <div className="flex flex-col items-center mb-8">
         <Image src="/logo.png" alt="English Tutor Logo" width={100} height={100} className="mb-4" />
-        <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 text-center">
-          Welcome to English Tutor
+        <h1 className="text-3xl md:text-4xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500 text-center">
+          English Tutor
         </h1>
         <p className="text-gray-300 dark:text-gray-300 light:text-gray-600 max-w-lg mx-auto text-center mt-3">
           Practice your English speaking skills with AI-powered feedback and realistic conversations
@@ -38,6 +38,21 @@ export default function Home() {
           buttonText="Try Scenarios"
         />
       </div>
+
+      <hr />
+      <small className="text-gray-300 dark:text-gray-300 light:text-gray-600 max-w-lg mx-auto text-center mt-10">
+        The project does not collect or store any user informations, or conversations histroy.
+        <br />
+        Developed by{" "}
+        <a
+          href="https://github.com/ikbal-nayem"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-purple-400 hover:underline"
+        >
+          Ikbal Nayem
+        </a>
+      </small>
     </div>
   );
 }
@@ -61,7 +76,7 @@ function FeatureCard({ title, description, icon, href, buttonText }: FeatureCard
           <p className="text-gray-300 dark:text-gray-300 light:text-gray-600 mb-6 flex-grow">{description}</p>
 
           <Link href={href}>
-            <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white">
+            <Button className="w-full bg-gradient-to-r from-blue-200 to-purple-300 dark:from-blue-500 dark:to-purple-600 hover:from-blue-400 hover:to-purple-500 text-white">
               {buttonText}
             </Button>
           </Link>

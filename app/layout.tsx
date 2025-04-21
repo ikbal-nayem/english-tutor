@@ -72,7 +72,7 @@ export default function RootLayout({
               <div className="container mx-auto px-4 py-2 max-w-4xl flex items-center justify-between">
                 <div className="flex items-center">
                   <Image src="/logo.png" alt="English Tutor Logo" width={32} height={32} className="mr-2" />
-                  <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">
+                  <span className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
                     English Tutor
                   </span>
                 </div>
