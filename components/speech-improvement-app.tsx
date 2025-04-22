@@ -8,7 +8,6 @@ import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import type { Sentence, SessionStats } from "@/types/speech";
 import { AlertTriangle, Mic, MicOff, Pause, Play, StopCircle, Volume2 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import DebugPanel from "./debug-panel";
 import SessionEvaluation from "./session-evaluation";
 import TranscriptDisplay from "./transcript-display";
 
@@ -33,7 +32,6 @@ export default function SpeechImprovementApp() {
     resetTranscript,
     startListening: startSpeechRecognition,
     stopListening: stopSpeechRecognition,
-    isListening: isSpeechRecognitionListening,
     browserSupportsSpeechRecognition,
     error: speechRecognitionError,
   } = useSpeechRecognition();

@@ -74,7 +74,7 @@ export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps)
           {reversedSentences.map((sentence, index) => (
             <Card
               key={index}
-              className="border dark:border-gray-700 light:border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+              className="border dark:border-gray-700 light:border-gray-200 hover:shadow-md transition-shadow"
             >
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
