@@ -171,15 +171,6 @@ export default function SpeechImprovementApp() {
     sessionStartTime.current = null;
   };
 
-  if (!browserSupportsSpeechRecognition) {
-    return (
-      <div className="p-6 bg-red-50 text-red-800 rounded-lg border border-red-200">
-        <h2 className="text-xl font-bold mb-2">Browser Not Supported</h2>
-        <p>Your browser doesn't support the Speech Recognition API. Please try using Chrome, Edge, or Safari.</p>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col md:flex-row gap-4">
@@ -212,7 +203,7 @@ export default function SpeechImprovementApp() {
                     </div>
 
                     {interimTranscript && (
-                      <div className="text-xs text-white/90 italic bg-black/20 p-1 rounded-lg max-h-[40px] overflow-y-auto">
+                      <div className="text-xs text-white/90 italic bg-black/20 p-1 rounded-lg h-full overflow-y-auto">
                         "{interimTranscript}"
                       </div>
                     )}
@@ -225,10 +216,15 @@ export default function SpeechImprovementApp() {
                     )}
                   </div>
                 )
-              ) : (
+              ) : browserSupportsSpeechRecognition ? (
                 <div className="flex items-center justify-center h-full text-white/80 text-xs py-1">
                   <Volume2 className="h-3 w-3 mr-1 opacity-70" />
                   Click Start to begin
+                </div>
+              ) : (
+                <div className="mt-2 text-xs text-yellow-200 bg-black/20 p-1.5 rounded-lg animate-pulse">
+                  <AlertTriangle className="h-3 w-3 inline mr-1" />
+                  Your browser doesn't support the Speech Recognition API. Please try using Chrome, Edge, or Safari.
                 </div>
               )}
 
@@ -245,6 +241,7 @@ export default function SpeechImprovementApp() {
                   onClick={handleStartListening}
                   className="bg-green-500 hover:bg-green-600 text-white shadow-md dark:bg-green-600 dark:hover:bg-green-700 light:bg-green-500 light:hover:bg-green-600"
                   size="sm"
+                  disabled={!browserSupportsSpeechRecognition}
                 >
                   <Mic className="mr-1 h-3 w-3" />
                   Start
