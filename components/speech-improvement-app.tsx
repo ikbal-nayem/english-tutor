@@ -38,11 +38,9 @@ export default function SpeechImprovementApp() {
 
   const { processText, isProcessing } = useLanguageProcessing();
 
-  // Add a state to track silence duration and provide feedback
   const [silenceTimer, setSilenceTimer] = useState<NodeJS.Timeout | null>(null);
   const [showSilenceHint, setShowSilenceHint] = useState(false);
 
-  // Handle new transcript
   useEffect(() => {
     const handleNewTranscript = async () => {
       if (transcript && transcript.trim() !== "" && transcript !== lastProcessedText.current) {
