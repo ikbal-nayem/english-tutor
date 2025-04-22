@@ -312,7 +312,7 @@ export default function SpeechImprovementApp() {
         onClose={handleStartNewSession}
       />
 
-      <DebugPanel
+      {/* <DebugPanel
         speechRecognitionState={{
           isListening: isSpeechRecognitionListening,
           transcript,
@@ -320,7 +320,7 @@ export default function SpeechImprovementApp() {
           error: speechRecognitionError,
           browserSupport: browserSupportsSpeechRecognition,
         }}
-      />
+      /> */}
     </div>
   );
 }

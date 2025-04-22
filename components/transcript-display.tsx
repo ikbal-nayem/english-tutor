@@ -1,44 +1,37 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { AlertTriangle, MessageSquare, Check, X, Lightbulb } from "lucide-react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import type { Sentence } from "@/types/speech"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card, CardContent } from "@/components/ui/card";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import type { Sentence } from "@/types/speech";
+import { AlertTriangle, Check, Lightbulb, MessageSquare, X } from "lucide-react";
+import { useState } from "react";
 
 interface TranscriptDisplayProps {
-  sentences: Sentence[]
+  sentences: Sentence[];
 }
 
 export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps) {
-  const [selectedSentence, setSelectedSentence] = useState<Sentence | null>(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [activeTab, setActiveTab] = useState<"mistakes" | "suggestions">("mistakes")
+  const [selectedSentence, setSelectedSentence] = useState<Sentence | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<"mistakes" | "suggestions">("mistakes");
 
   // Check if we have any API errors
-  const hasCreditErrors = sentences.some((s) => s.errorType === "INSUFFICIENT_CREDITS")
-  const hasParsingErrors = sentences.some((s) => s.errorType === "PARSING_ERROR")
+  const hasCreditErrors = sentences.some((s) => s.errorType === "INSUFFICIENT_CREDITS");
+  const hasParsingErrors = sentences.some((s) => s.errorType === "PARSING_ERROR");
 
   if (sentences.length === 0) {
-    return null
+    return null;
   }
 
-  // Create a reversed copy of the sentences array for display
-  const reversedSentences = [...sentences].reverse()
+  const reversedSentences = [...sentences].reverse();
 
-  const openSentenceDetails = (sentence: Sentence) => {
-    setSelectedSentence(sentence)
-    setIsModalOpen(true)
-
-    // Set the active tab based on whether there are mistakes or suggestions
-    if (sentence.mistakes && sentence.mistakes.length > 0) {
-      setActiveTab("mistakes")
-    } else if (sentence.suggestions && sentence.suggestions.length > 0) {
-      setActiveTab("suggestions")
-    }
-  }
+  const openSentenceDetails = (sentence: Sentence, active: "mistakes" | "suggestions") => {
+    setActiveTab(active);
+    setSelectedSentence(sentence);
+    setIsModalOpen(true);
+  };
 
   return (
     <>
@@ -82,7 +75,6 @@ export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps)
             <Card
               key={index}
               className="border dark:border-gray-700 light:border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
-              onClick={() => openSentenceDetails(sentence)}
             >
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
@@ -109,13 +101,19 @@ export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps)
                     {!sentence.apiError && (
                       <div className="mt-3 flex flex-wrap gap-1">
                         {sentence.mistakes && sentence.mistakes.length > 0 && (
-                          <span className="inline-flex items-center text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded hover:bg-red-200 transition-colors dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 light:bg-red-100 light:text-red-700 light:hover:bg-red-200">
+                          <span
+                            onClick={() => openSentenceDetails(sentence, "mistakes")}
+                            className="inline-flex items-center text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded hover:bg-red-200 transition-colors dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 light:bg-red-100 light:text-red-700 light:hover:bg-red-200"
+                          >
                             <X className="h-3 w-3 mr-1" /> {sentence.mistakes.length} mistake(s)
                           </span>
                         )}
 
                         {sentence.suggestions && sentence.suggestions.length > 0 && (
-                          <span className="inline-flex items-center text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded hover:bg-amber-200 transition-colors dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50 light:bg-amber-100 light:text-amber-700 light:hover:bg-amber-200">
+                          <span
+                            onClick={() => openSentenceDetails(sentence, "suggestions")}
+                            className="inline-flex items-center text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded hover:bg-amber-200 transition-colors dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50 light:bg-amber-100 light:text-amber-700 light:hover:bg-amber-200"
+                          >
                             <Lightbulb className="h-3 w-3 mr-1" /> {sentence.suggestions.length} suggestion(s)
                           </span>
                         )}
@@ -137,7 +135,6 @@ export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps)
         </div>
       </div>
 
-      {/* Details Modal - Updated to match the FeedbackModal design */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent className="sm:max-w-[500px] bg-slate-800 dark:bg-gray-800 light:bg-white border-slate-700 dark:border-gray-700 light:border-gray-200 text-white dark:text-gray-100 light:text-gray-900">
           <DialogHeader>
@@ -155,7 +152,7 @@ export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps)
                 </p>
               </div>
 
-              {selectedSentence.detectedLanguage &&
+              {/* {selectedSentence.detectedLanguage &&
                 selectedSentence.detectedLanguage !== "en" &&
                 selectedSentence.translatedText && (
                   <div className="bg-blue-50 p-3 rounded-lg dark:bg-blue-900/30 light:bg-blue-50">
@@ -166,13 +163,13 @@ export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps)
                       {selectedSentence.translatedText}
                     </p>
                   </div>
-                )}
+                )} */}
 
               {selectedSentence.correctedText &&
                 selectedSentence.correctedText !== selectedSentence.originalText &&
                 !selectedSentence.apiError && (
                   <div className="bg-green-50 p-3 rounded-lg dark:bg-green-900/30 light:bg-green-50">
-                    <h3 className="flex items-center text-sm font-medium text-gray-500 dark:text-gray-400 light:text-gray-500">
+                    <h3 className="flex items-center text-sm font-bold text-gray-500 dark:text-gray-400 light:text-gray-500">
                       <Check className="h-4 w-4 mr-1 text-green-600 dark:text-green-400 light:text-green-600" />{" "}
                       Corrected:
                     </h3>
@@ -277,27 +274,27 @@ export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps)
         </DialogContent>
       </Dialog>
     </>
-  )
+  );
 }
 
 // Helper function to get full language name from ISO code
-function getLanguageName(code: string): string {
-  const languages: Record<string, string> = {
-    en: "English",
-    es: "Spanish",
-    fr: "French",
-    de: "German",
-    it: "Italian",
-    pt: "Portuguese",
-    ru: "Russian",
-    zh: "Chinese",
-    ja: "Japanese",
-    ko: "Korean",
-    ar: "Arabic",
-    hi: "Hindi",
-    bn: "Bengali",
-    // Add more languages as needed
-  }
+// function getLanguageName(code: string): string {
+//   const languages: Record<string, string> = {
+//     en: "English",
+//     es: "Spanish",
+//     fr: "French",
+//     de: "German",
+//     it: "Italian",
+//     pt: "Portuguese",
+//     ru: "Russian",
+//     zh: "Chinese",
+//     ja: "Japanese",
+//     ko: "Korean",
+//     ar: "Arabic",
+//     hi: "Hindi",
+//     bn: "Bengali",
+//     // Add more languages as needed
+//   };
 
-  return languages[code] || code
-}
+//   return languages[code] || code;
+// }
