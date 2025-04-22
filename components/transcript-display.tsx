@@ -87,7 +87,6 @@ export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps)
                       {sentence.originalText}
                     </p>
 
-                    {/* Corrected text shown directly below original */}
                     {!sentence.apiError &&
                       sentence.correctedText &&
                       sentence.correctedText !== sentence.originalText && (
