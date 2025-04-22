@@ -1,17 +1,21 @@
-"use client"
+"use client";
 
-import { Moon, Sun, Laptop } from "lucide-react"
-import { useTheme } from "@/components/theme-provider"
-import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { useTheme } from "@/components/theme-provider";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Laptop, Moon, Sun } from "lucide-react";
 
 export function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
+  const { theme, setTheme } = useTheme();
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="h-9 w-9 text-white dark:text-gray-200 light:text-gray-700">
+        <button className="h-9 w-9 text-white dark:text-gray-200 light:text-gray-700 focus:outline-none">
           {theme === "light" ? (
             <Sun className="h-4 w-4" />
           ) : theme === "dark" ? (
@@ -20,7 +24,7 @@ export function ThemeToggle() {
             <Laptop className="h-4 w-4" />
           )}
           <span className="sr-only">Toggle theme</span>
-        </Button>
+        </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuItem onClick={() => setTheme("light")}>
@@ -37,5 +41,5 @@ export function ThemeToggle() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }

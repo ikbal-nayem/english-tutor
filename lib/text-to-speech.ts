@@ -1,6 +1,7 @@
 "use client";
 
 const allVoicesObtained = new Promise(function (resolve, reject) {
+  if (typeof window === "undefined") return;
   let voices = window.speechSynthesis.getVoices();
   if (voices.length !== 0) {
     resolve(voices);
@@ -19,8 +20,8 @@ export function speakText(text: string) {
       utterance.voice = voices[1];
       utterance.rate = 1.0;
       utterance.pitch = 1.1;
-      console.log(voices, utterance);
       window.speechSynthesis.speak(utterance);
+      console.log(utterance);
     });
   } else {
     console.log("Sorry, your browser doesn't support text to speech!");

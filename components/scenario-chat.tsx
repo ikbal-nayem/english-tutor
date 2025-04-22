@@ -456,7 +456,6 @@ export default function ScenarioChat({ scenario }: { scenario: ScenarioData }) {
             )}
 
             <div className="relative flex items-end gap-2 bg-slate-700/30 dark:bg-gray-700/30 light:bg-gray-100 rounded-xl p-1 border border-slate-600/50 dark:border-gray-600/50 light:border-gray-300">
-              {/* Mic button moved to the left */}
               {browserSupportsSpeechRecognition && (
                 <Button
                   type="button"
