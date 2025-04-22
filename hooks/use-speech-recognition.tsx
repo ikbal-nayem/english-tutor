@@ -29,23 +29,37 @@ export function useSpeechRecognition(): SpeechRecognitionHook {
 
   // Initialize speech recognition
   const initRecognition = useCallback(() => {
-    if (typeof window === "undefined") return
+    console.log("Initializing speech recognition...")
+    if (typeof window === "undefined") {
+      console.log("Window is undefined - not in browser environment")
+      return
+    }
 
     try {
+      console.log("Checking for SpeechRecognition API...")
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
 
       if (!SpeechRecognition) {
-        setError("Your browser doesn't support speech recognition")
+        const errorMsg = "Your browser doesn't support speech recognition"
+        console.error(errorMsg)
+        setError(errorMsg)
         return
       }
+      console.log("SpeechRecognition API found:", SpeechRecognition)
 
       // Create a new recognition instance
       const recognition = new SpeechRecognition()
+      console.log("SpeechRecognition instance created:", recognition)
 
       // Configure recognition
       recognition.continuous = true
       recognition.interimResults = true
       recognition.lang = "en-US"
+      console.log("SpeechRecognition configured:", {
+        continuous: recognition.continuous,
+        interimResults: recognition.interimResults,
+        lang: recognition.lang
+      })
 
       // Set up event handlers
       recognition.onstart = () => {
@@ -55,25 +69,37 @@ export function useSpeechRecognition(): SpeechRecognitionHook {
       }
 
       recognition.onresult = (event: any) => {
+        console.log("SpeechRecognition onresult event:", event)
         let finalTranscript = ""
         let currentInterimTranscript = ""
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
-          const transcript = event.results[i][0].transcript
+          const result = event.results[i]
+          const transcript = result[0].transcript
+          console.log("Speech result:", {
+            transcript,
+            isFinal: result.isFinal,
+            confidence: result[0].confidence
+          })
 
-          if (event.results[i].isFinal) {
+          if (result.isFinal) {
             finalTranscript += transcript
             console.log("Final transcript:", finalTranscript)
           } else {
             currentInterimTranscript += transcript
+            console.log("Interim transcript:", currentInterimTranscript)
           }
         }
 
         if (finalTranscript) {
+          console.log("Setting final transcript:", finalTranscript)
           setTranscript(finalTranscript)
           setInterimTranscript("")
+          console.log("Transcript state updated")
         } else if (currentInterimTranscript) {
+          console.log("Setting interim transcript:", currentInterimTranscript)
           setInterimTranscript(currentInterimTranscript)
+          console.log("InterimTranscript state updated")
         }
       }
 

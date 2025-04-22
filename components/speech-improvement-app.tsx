@@ -44,13 +44,8 @@ export default function SpeechImprovementApp() {
   const [silenceTimer, setSilenceTimer] = useState<NodeJS.Timeout | null>(null);
   const [showSilenceHint, setShowSilenceHint] = useState(false);
 
-  // Append speech to textarea only when speech ends
-  useEffect(() => {
-    if (transcript && !interimTranscript && isRecording) {
-      setManualInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
-      resetTranscript();
-    }
-  }, [transcript, interimTranscript, isRecording, resetTranscript]);
+  // Track last appended transcript
+  const lastAppendedTranscript = useRef("");
 
   // Handle silence detection
   useEffect(() => {
@@ -77,6 +72,41 @@ export default function SpeechImprovementApp() {
       }
     };
   }, [transcript, interimTranscript, isRecording]);
+
+  // Append speech to textarea
+  useEffect(() => {
+    console.log("Component transcript update - Current state:", {
+      transcript,
+      interimTranscript,
+      lastAppended: lastAppendedTranscript.current,
+      manualInput,
+      textareaValue: textareaRef.current?.value
+    });
+
+    if (transcript && transcript !== lastAppendedTranscript.current) {
+      console.log("Processing transcript - Before update:", {
+        currentManualInput: manualInput,
+        newTranscript: transcript
+      });
+      setManualInput((prev) => {
+        const newValue = prev ? `${prev} ${transcript}` : transcript;
+        console.log("Updating manualInput:", {
+          previousValue: prev,
+          newValue,
+          transcript
+        });
+        lastAppendedTranscript.current = transcript;
+        return newValue;
+      });
+
+      // Reset when we have a final transcript
+      if (!interimTranscript) {
+        console.log("Resetting transcript after final result");
+        resetTranscript();
+        lastAppendedTranscript.current = "";
+      }
+    }
+  }, [transcript, interimTranscript, resetTranscript]);
 
   // Auto-resize textarea
   useEffect(() => {
@@ -157,12 +187,7 @@ export default function SpeechImprovementApp() {
   const handleProcessText = async () => {
     if (!manualInput.trim()) return;
 
-    // Stop recording if active
     handlePauseRecording();
-    // if (isRecording) {
-    //   stopSpeechRecognition();
-    //   setIsRecording(false);
-    // }
 
     // Add pending sentence immediately
     const pendingSentence = {
