@@ -29,7 +29,6 @@ export default function ScenarioPage({ params }: ScenarioPageProps) {
             className="text-white hover:text-white dark:text-gray-300 dark:hover:text-white light:text-gray-700 light:hover:text-gray-900"
           >
             <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Scenarios
           </Button>
         </Link>
         <h1 className="text-xl font-bold ml-2 text-white dark:text-white light:text-gray-900">{scenario.title}</h1>
