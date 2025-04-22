@@ -74,7 +74,7 @@ export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps)
           {reversedSentences.map((sentence, index) => (
             <Card
               key={index}
-              className="border dark:border-gray-700 light:border-gray-200 hover:shadow-md transition-shadow"
+              className="bg-slate-800 border dark:border-gray-700 light:border-gray-200 hover:shadow-md transition-shadow"
             >
               <CardContent className="p-4">
                 <div className="flex items-start gap-3">
@@ -102,7 +102,7 @@ export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps)
                         {sentence.mistakes && sentence.mistakes.length > 0 && (
                           <span
                             onClick={() => openSentenceDetails(sentence, "mistakes")}
-                            className="inline-flex items-center text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded hover:bg-red-200 transition-colors dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 light:bg-red-100 light:text-red-700 light:hover:bg-red-200"
+                            className="inline-flex items-center text-xs bg-red-100 text-red-800 px-2 py-0.5 rounded hover:bg-red-200 transition-colors dark:bg-red-900/30 dark:text-red-300 dark:hover:bg-red-900/50 light:bg-red-100 light:text-red-700 light:hover:bg-red-200 cursor-pointer"
                           >
                             <X className="h-3 w-3 mr-1" /> {sentence.mistakes.length} mistake(s)
                           </span>
@@ -111,7 +111,7 @@ export default function TranscriptDisplay({ sentences }: TranscriptDisplayProps)
                         {sentence.suggestions && sentence.suggestions.length > 0 && (
                           <span
                             onClick={() => openSentenceDetails(sentence, "suggestions")}
-                            className="inline-flex items-center text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded hover:bg-amber-200 transition-colors dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50 light:bg-amber-100 light:text-amber-700 light:hover:bg-amber-200"
+                            className="inline-flex items-center text-xs bg-amber-100 text-amber-800 px-2 py-0.5 rounded hover:bg-amber-200 transition-colors dark:bg-amber-900/30 dark:text-amber-300 dark:hover:bg-amber-900/50 light:bg-amber-100 light:text-amber-700 light:hover:bg-amber-200 cursor-pointer"
                           >
                             <Lightbulb className="h-3 w-3 mr-1" /> {sentence.suggestions.length} suggestion(s)
                           </span>

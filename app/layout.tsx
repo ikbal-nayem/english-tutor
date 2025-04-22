@@ -67,7 +67,7 @@ export default function RootLayout({
           <div className="min-h-screen bg-gradient-to-b from-gray-900 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 light:from-white light:via-gray-50 light:to-white text-gray-900 dark:text-gray-100 flex flex-col">
             <Navbar />
             <main className="flex-1">
-              <div className="container mx-auto px-4 py-4 max-w-4xl">{children}</div>
+              <div className="container mx-auto px-4 py-4 max-w-5xl">{children}</div>
             </main>
           </div>
         </ThemeProvider>

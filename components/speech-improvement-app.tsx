@@ -6,15 +6,17 @@ import { Card } from "@/components/ui/card";
 import { useLanguageProcessing } from "@/hooks/use-language-processing";
 import { useSpeechRecognition } from "@/hooks/use-speech-recognition";
 import type { Sentence, SessionStats } from "@/types/speech";
-import { AlertTriangle, Mic, MicOff, Pause, Play, StopCircle, Volume2 } from "lucide-react";
+import clsx from "clsx";
+import { AlertTriangle, Mic, MicOff, Send, StopCircle } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import SessionEvaluation from "./session-evaluation";
 import TranscriptDisplay from "./transcript-display";
 
 export default function SpeechImprovementApp() {
-  const [isListening, setIsListening] = useState(false);
+  const [isRecording, setIsRecording] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
   const [sentences, setSentences] = useState<Sentence[]>([]);
+  const [manualInput, setManualInput] = useState("");
   const [showEvaluation, setShowEvaluation] = useState(false);
   const [sessionStats, setSessionStats] = useState<SessionStats>({
     totalSentences: 0,
@@ -25,6 +27,7 @@ export default function SpeechImprovementApp() {
   });
   const sessionStartTime = useRef<number | null>(null);
   const lastProcessedText = useRef<string>("");
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const {
     transcript,
@@ -41,33 +44,13 @@ export default function SpeechImprovementApp() {
   const [silenceTimer, setSilenceTimer] = useState<NodeJS.Timeout | null>(null);
   const [showSilenceHint, setShowSilenceHint] = useState(false);
 
+  // Append speech to textarea only when speech ends
   useEffect(() => {
-    const handleNewTranscript = async () => {
-      if (transcript && transcript.trim() !== "" && transcript !== lastProcessedText.current) {
-        console.log("Processing new transcript:", transcript);
-        lastProcessedText.current = transcript;
-
-        try {
-          // Process the transcript with OpenRouter API
-          const result = await processText(transcript);
-          console.log("Processed result:", result);
-
-          // Add the processed sentence to the list
-          setSentences((prev) => [...prev, result]);
-        } catch (error) {
-          console.error("Error processing transcript:", error);
-        }
-
-        // Reset the transcript for the next sentence
-        resetTranscript();
-      }
-    };
-
-    // If we have a transcript and we're not processing, handle it
-    if (transcript && !isProcessing && isListening && !isPaused) {
-      handleNewTranscript();
+    if (transcript && !interimTranscript && isRecording) {
+      setManualInput((prev) => (prev ? `${prev} ${transcript}` : transcript));
+      resetTranscript();
     }
-  }, [transcript, isProcessing, isListening, isPaused, processText, resetTranscript]);
+  }, [transcript, interimTranscript, isRecording, resetTranscript]);
 
   // Handle silence detection
   useEffect(() => {
@@ -79,7 +62,7 @@ export default function SpeechImprovementApp() {
     }
 
     // Only set up silence detection when actively listening
-    if (isListening && !isPaused) {
+    if (isRecording) {
       // Set a timer to show a hint if no speech is detected for 10 seconds
       const timer = setTimeout(() => {
         setShowSilenceHint(true);
@@ -93,38 +76,51 @@ export default function SpeechImprovementApp() {
         clearTimeout(silenceTimer);
       }
     };
-  }, [transcript, interimTranscript, isListening, isPaused]);
+  }, [transcript, interimTranscript, isRecording]);
 
-  // Start listening
-  const handleStartListening = () => {
-    console.log("Starting listening...");
-    setIsListening(true);
-    setIsPaused(false);
-    startSpeechRecognition();
-    setSentences([]);
-    setShowEvaluation(false);
-    sessionStartTime.current = Date.now();
-    lastProcessedText.current = "";
+  // Auto-resize textarea
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      const scrollHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = `${Math.min(scrollHeight, 200)}px`;
+    }
+  }, [manualInput]);
+
+  // Start recording
+  const handleStartRecording = () => {
+    console.log("Starting recording...");
+    try {
+      startSpeechRecognition();
+      setIsRecording(true);
+      setIsPaused(false);
+      setSentences([]);
+      setShowEvaluation(false);
+      sessionStartTime.current = Date.now();
+      lastProcessedText.current = "";
+    } catch (error) {
+      console.error("Error starting speech recognition:", error);
+    }
   };
 
-  // Pause listening
-  const handlePauseListening = () => {
-    console.log("Pausing listening...");
+  // Pause recording
+  const handlePauseRecording = () => {
+    console.log("Pausing recording...");
     setIsPaused(true);
     stopSpeechRecognition();
   };
 
-  // Resume listening
-  const handleResumeListening = () => {
-    console.log("Resuming listening...");
+  // Resume recording
+  const handleResumeRecording = () => {
+    console.log("Resuming recording...");
     setIsPaused(false);
     startSpeechRecognition();
   };
 
-  // Stop listening and show evaluation
-  const handleStopListening = () => {
-    console.log("Stopping listening...");
-    setIsListening(false);
+  // End session and show evaluation
+  const handleEndSession = () => {
+    console.log("Ending session...");
+    setIsRecording(false);
     setIsPaused(false);
     stopSpeechRecognition();
 
@@ -158,6 +154,43 @@ export default function SpeechImprovementApp() {
     setShowEvaluation(true);
   };
 
+  const handleProcessText = async () => {
+    if (!manualInput.trim()) return;
+
+    // Stop recording if active
+    handlePauseRecording();
+    // if (isRecording) {
+    //   stopSpeechRecognition();
+    //   setIsRecording(false);
+    // }
+
+    // Add pending sentence immediately
+    const pendingSentence = {
+      originalText: manualInput,
+      correctedText: "",
+      isProcessing: true,
+    };
+    setSentences((prev) => [...prev, pendingSentence]);
+    const inputText = manualInput;
+    setManualInput("");
+
+    try {
+      const result = await processText(inputText);
+      console.log("Processed result:", result);
+      setSentences((prev) => [...prev.slice(0, -1), { ...result, isProcessing: false }]);
+    } catch (error) {
+      console.error("Error processing text:", error);
+      setSentences((prev) => [
+        ...prev.slice(0, -1),
+        {
+          ...pendingSentence,
+          isProcessing: false,
+          apiError: true,
+        },
+      ]);
+    }
+  };
+
   // Start a new session
   const handleStartNewSession = () => {
     setShowEvaluation(false);
@@ -168,61 +201,40 @@ export default function SpeechImprovementApp() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <>
       <div className="flex flex-col md:flex-row gap-4">
-        <Card className="md:w-1/3 p-3 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 text-white dark:from-indigo-600 dark:via-purple-600 dark:to-pink-600 light:from-indigo-400 light:via-purple-400 light:to-pink-400 shadow-md">
+        <Card className="md:w-1/3 p-3 bg-gradient-to-r from-indigo-500 to-purple-500 text-white dark:from-indigo-600 dark:to-purple-600 light:from-indigo-400 light:via-purple-400 light:to-pink-400 shadow-md">
           <div className="flex flex-col h-full">
             <div className="flex justify-between items-center mb-2">
-              <h2 className="text-sm font-bold">Speech Recorder</h2>
-              {isListening && !isPaused && (
-                <div className="flex items-center text-xs bg-white/20 backdrop-blur-sm rounded-full px-2 py-0.5">
-                  <span className="animate-pulse mr-1 text-red-300">●</span> Recording
-                </div>
+              <h2 className="text-sm font-bold">Practice Session</h2>
+              {sentences.length > 0 && (
+                <button
+                  onClick={handleEndSession}
+                  className="flex items-center px-2 py-1 rounded-full text-xs bg-red-500 hover:bg-red-600 text-white shadow-md"
+                >
+                  <StopCircle className="h-3 w-3 mr-1" />
+                  End Session
+                </button>
               )}
             </div>
 
             <div className="relative min-h-[60px] p-2 bg-white/10 backdrop-blur-sm rounded-lg shadow-inner flex-grow">
-              {isListening ? (
-                isPaused ? (
-                  <div className="flex items-center text-yellow-200 text-xs">
-                    <MicOff className="mr-1 h-3 w-3" />
-                    Paused
+              <textarea
+                ref={textareaRef}
+                value={manualInput}
+                onChange={(e) => setManualInput(e.target.value)}
+                className="w-full h-full bg-transparent text-white text-sm mb-2 focus:outline-none resize-none"
+                placeholder="Type or speak your text here..."
+              />
+              <div className="absolute bottom-1 left-1 text-xs text-green-200 flex items-center">
+                {isPaused ? <MicOff className="h-3 w-3 mr-1" /> : <Mic className="h-3 w-3 mr-1" />}
+                {interimTranscript && <span className="italic">"{interimTranscript}"</span>}
+                {!interimTranscript && (
+                  <div className="text-xs text-gray-300">
+                    <span className="animate-pulse">{isPaused ? "Paused" : "Listening..."}</span>
                   </div>
-                ) : (
-                  <div className="space-y-1">
-                    <div className="flex items-center text-green-200 text-xs gap-2">
-                      <div className="relative mr-1">
-                        <Mic className="h-3 w-3" />
-                        <div className="absolute -inset-1 rounded-full bg-green-400/30 animate-pulse" />
-                      </div>
-                      Listening...
-                    </div>
-
-                    {interimTranscript && (
-                      <div className="text-xs text-white/90 italic bg-black/20 p-1 rounded-lg h-full overflow-y-auto">
-                        "{interimTranscript}"
-                      </div>
-                    )}
-
-                    {showSilenceHint && !interimTranscript && (
-                      <div className="mt-2 text-xs text-yellow-200 bg-black/20 p-1.5 rounded-lg animate-pulse">
-                        <AlertTriangle className="h-3 w-3 inline mr-1" />
-                        No speech detected. Please speak or check your microphone.
-                      </div>
-                    )}
-                  </div>
-                )
-              ) : browserSupportsSpeechRecognition ? (
-                <div className="flex items-center justify-center h-full text-white/80 text-xs py-1">
-                  <Volume2 className="h-3 w-3 mr-1 opacity-70" />
-                  Click Start to begin
-                </div>
-              ) : (
-                <div className="mt-2 text-xs text-yellow-200 bg-black/20 p-1.5 rounded-lg animate-pulse">
-                  <AlertTriangle className="h-3 w-3 inline mr-1" />
-                  Your browser doesn't support the Speech Recognition API. Please try using Chrome, Edge, or Safari.
-                </div>
-              )}
+                )}
+              </div>
 
               {isProcessing && (
                 <div className="absolute right-1 top-1 bg-blue-600/80 text-white text-[10px] px-1.5 py-0.5 rounded-full animate-pulse">
@@ -231,53 +243,33 @@ export default function SpeechImprovementApp() {
               )}
             </div>
 
-            <div className="flex justify-center gap-2 mt-2">
-              {!isListening ? (
-                <Button
-                  onClick={handleStartListening}
-                  className="bg-green-500 hover:bg-green-600 text-white shadow-md dark:bg-green-600 dark:hover:bg-green-700 light:bg-green-500 light:hover:bg-green-600"
-                  size="sm"
-                  disabled={!browserSupportsSpeechRecognition}
-                >
-                  <Mic className="mr-1 h-3 w-3" />
-                  Start
-                </Button>
-              ) : (
-                <>
-                  {isPaused ? (
-                    <Button
-                      onClick={handleResumeListening}
-                      className="bg-amber-500 hover:bg-amber-600 text-white shadow-md dark:bg-amber-600 dark:hover:bg-amber-700 light:bg-amber-500 light:hover:bg-amber-600"
-                      size="sm"
-                    >
-                      <Play className="mr-1 h-3 w-3" />
-                      Resume
-                    </Button>
-                  ) : (
-                    <Button
-                      onClick={handlePauseListening}
-                      className="bg-amber-500 hover:bg-amber-600 text-white shadow-md dark:bg-amber-600 dark:hover:bg-amber-700 light:bg-amber-500 light:hover:bg-amber-600"
-                      size="sm"
-                    >
-                      <Pause className="mr-1 h-3 w-3" />
-                      Pause
-                    </Button>
-                  )}
+            <div className="flex flex-col gap-2 mt-2">
+              <div className="flex justify-between gap-2">
+                {browserSupportsSpeechRecognition ? (
                   <Button
-                    onClick={handleStopListening}
-                    className="bg-red-500 hover:bg-red-600 text-white shadow-md dark:bg-red-600 dark:hover:bg-red-700 light:bg-red-500 light:hover:bg-red-600"
+                    onClick={isPaused ? handleResumeRecording : handlePauseRecording}
+                    className={clsx("rounded-full", {
+                      "bg-blue-600 hover:bg-blue-600/50 text-white shadow-md": !isPaused,
+                      "bg-gray-500 hover:bg-gray-600 text-white": isPaused,
+                    })}
                     size="sm"
                   >
-                    <StopCircle className="mr-1 h-3 w-3" />
-                    Stop
+                    {isPaused ? <Mic className="h-3 w-3" /> : <MicOff className="h-3 w-3" />}
                   </Button>
-                </>
-              )}
+                ) : null}
+
+                <Button
+                  onClick={handleProcessText}
+                  className="rounded-full bg-green-500 hover:bg-green-600 text-white shadow-md"
+                  size="sm"
+                  disabled={!manualInput.trim()}
+                >
+                  <Send className="h-3 w-3" />
+                </Button>
+              </div>
             </div>
           </div>
         </Card>
-
-        {/* Main content area */}
         <div className="md:w-2/3 flex flex-col gap-4">
           {speechRecognitionError && (
             <Alert
@@ -294,7 +286,7 @@ export default function SpeechImprovementApp() {
           ) : (
             <Card className="p-4 bg-white/5 backdrop-blur-sm border border-white/10 text-center dark:bg-gray-800/30 dark:border-gray-700/30 light:bg-white light:border-gray-200">
               <p className="text-gray-300 text-sm dark:text-gray-400 light:text-gray-500">
-                Your conversation will appear here. Start speaking to begin.
+                Your text will appear here. Start speaking or typing to begin.
               </p>
             </Card>
           )}
@@ -317,6 +309,6 @@ export default function SpeechImprovementApp() {
           browserSupport: browserSupportsSpeechRecognition,
         }}
       /> */}
-    </div>
+    </>
   );
 }
