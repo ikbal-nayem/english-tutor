@@ -37,14 +37,9 @@ export default function Navbar() {
             </PopoverTrigger>
             <PopoverContent className="w-fit rounded-lg p-1 bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl shadow-2xl overflow-hidden">
               <div className="flex flex-col">
-                <NavLink href="/" icon={<Home className="h-5 w-5" />} label="Home" onClick={close} />
-                <NavLink href="/practice" icon={<Mic className="h-5 w-5" />} label="Practice" onClick={close} />
-                <NavLink
-                  href="/scenarios"
-                  icon={<MessageSquare className="h-5 w-5" />}
-                  label="Scenarios"
-                  onClick={close}
-                />
+                <NavLink href="/" icon={<Home className="h-5 w-5" />} label="Home" />
+                <NavLink href="/practice" icon={<Mic className="h-5 w-5" />} label="Practice" />
+                <NavLink href="/scenarios" icon={<MessageSquare className="h-5 w-5" />} label="Scenarios" />
                 <div className="border-t border-white/10 dark:border-gray-800 mt-2 pt-2">
                   <div className="w-fit p-3 text-sm rounded-md hover:bg-white/10 dark:hover:bg-gray-700/50 light:hover:bg-gray-100 transition-colors">
                     <ThemeToggle />
