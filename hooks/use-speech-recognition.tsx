@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useIsMobile } from "./use-mobile";
 
 interface SpeechRecognitionHook {
   transcript: string;
@@ -18,6 +19,7 @@ export function useSpeechRecognition(): SpeechRecognitionHook {
   const [interimTranscript, setInterimTranscript] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const isMobile = useIsMobile();
 
   // Use refs to maintain instance across renders
   const recognitionRef = useRef<any>(null);
@@ -68,10 +70,10 @@ export function useSpeechRecognition(): SpeechRecognitionHook {
           const result = event.results[i];
           const transcript = result[0].transcript;
 
-          if (result.isFinal) {
-            finalTranscript += transcript;
+          if (result.isFinal && event.results[i][0].confidence !== 0) {
+            finalTranscript = (isMobile ? "" : finalTranscript) + transcript;
           } else {
-            currentInterimTranscript += transcript;
+            currentInterimTranscript = (isMobile ? "" : currentInterimTranscript) + transcript;
           }
         }
 

@@ -218,7 +218,7 @@ export default function SpeechImprovementApp() {
               />
               <div className="absolute bottom-1 left-1 text-xs text-green-200 flex items-center">
                 {isPaused ? <MicOff className="h-3 w-3 mr-1" /> : <Mic className="h-3 w-3 mr-1" />}
-                {interimTranscript && <span className="italic">"{interimTranscript}"</span>}
+                {interimTranscript && <span className="italic">"{interimTranscript?.trim()}"</span>}
                 {!interimTranscript && (
                   <div className="text-xs text-gray-300">
                     <span className="animate-pulse">{isPaused ? "Paused" : "Listening..."}</span>
