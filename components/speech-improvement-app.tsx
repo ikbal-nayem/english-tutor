@@ -14,7 +14,7 @@ import TranscriptDisplay from "./transcript-display";
 
 export default function SpeechImprovementApp() {
   const [isRecording, setIsRecording] = useState(false);
-  const [isPaused, setIsPaused] = useState(false);
+  const [isPaused, setIsPaused] = useState(true);
   const [sentences, setSentences] = useState<Sentence[]>([]);
   const [manualInput, setManualInput] = useState("");
   const [showEvaluation, setShowEvaluation] = useState(false);
@@ -75,33 +75,14 @@ export default function SpeechImprovementApp() {
 
   // Append speech to textarea
   useEffect(() => {
-    console.log("Component transcript update - Current state:", {
-      transcript,
-      interimTranscript,
-      lastAppended: lastAppendedTranscript.current,
-      manualInput,
-      textareaValue: textareaRef.current?.value
-    });
-
     if (transcript && transcript !== lastAppendedTranscript.current) {
-      console.log("Processing transcript - Before update:", {
-        currentManualInput: manualInput,
-        newTranscript: transcript
-      });
       setManualInput((prev) => {
         const newValue = prev ? `${prev} ${transcript}` : transcript;
-        console.log("Updating manualInput:", {
-          previousValue: prev,
-          newValue,
-          transcript
-        });
         lastAppendedTranscript.current = transcript;
         return newValue;
       });
 
-      // Reset when we have a final transcript
       if (!interimTranscript) {
-        console.log("Resetting transcript after final result");
         resetTranscript();
         lastAppendedTranscript.current = "";
       }
@@ -116,22 +97,6 @@ export default function SpeechImprovementApp() {
       textareaRef.current.style.height = `${Math.min(scrollHeight, 200)}px`;
     }
   }, [manualInput]);
-
-  // Start recording
-  const handleStartRecording = () => {
-    console.log("Starting recording...");
-    try {
-      startSpeechRecognition();
-      setIsRecording(true);
-      setIsPaused(false);
-      setSentences([]);
-      setShowEvaluation(false);
-      sessionStartTime.current = Date.now();
-      lastProcessedText.current = "";
-    } catch (error) {
-      console.error("Error starting speech recognition:", error);
-    }
-  };
 
   // Pause recording
   const handlePauseRecording = () => {
@@ -279,7 +244,7 @@ export default function SpeechImprovementApp() {
                     })}
                     size="sm"
                   >
-                    {isPaused ? <Mic className="h-3 w-3" /> : <MicOff className="h-3 w-3" />}
+                    {isPaused ? <Mic className="h-4 w-4" /> : <MicOff className="h-4 w-4" />}
                   </Button>
                 ) : null}
 
